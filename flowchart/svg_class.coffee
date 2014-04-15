@@ -5,7 +5,7 @@
 #
 
 # jQuery's removeClass doesn't work for SVG, but this does!
-# takes the object obj to remove from, and removes class remove
+# takes the object obj to remove from, and removes class removeD
 # returns true if successful, false if remove does not exist in obj
 removeClassSVG = (obj, remove) ->
   classes = obj.attr("class")

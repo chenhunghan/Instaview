@@ -1,6 +1,6 @@
 #
 # Debug utilities.
-#
+# S
 (->
   throw new Error("debug object already defined!")  if typeof debug isnt "undefined"
   debug = {}

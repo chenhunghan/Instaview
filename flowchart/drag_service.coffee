@@ -1,7 +1,7 @@
 
 #
 # Service used to help with dragging and clicking on elements.
-#
+# S
 angular.module("dragging", ["mouseCapture"]).factory "dragging", ($rootScope, mouseCapture) ->
   
   #

@@ -354,9 +354,10 @@ flowchart = {}
 
       while i < @nodes.length
         node = @nodes[i]
-        return node  if node.data.id is nodeID
+        return node if node.data.id is nodeID
         ++i
-      throw new Error("Failed to find node " + nodeID)return
+      throw new Error("Failed to find node " + nodeID)
+      return
 
     
     #
