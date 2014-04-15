@@ -1,0 +1,29 @@
+{
+  "name": "IntraView",
+  "main": "index.html",
+  "version": "0.1.0",
+  "window": {
+    "title": "IntraView",
+    "toolbar": true,
+    "frame": true,
+    "width": 1200,
+    "height": 620,
+    "position": "mouse",
+    "min_width": 1200,
+    "min_height": 620,
+    "show": false,
+    "fullscreen": false,
+    "resizable": false
+  },
+  "devDependencies": {
+    "underscore": "1.5.1",
+    "underscore.string": "2.3.3",
+    "coffeecup": "0.3.21",
+    "grunt-node-webkit-builder": "0.1.14",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-shell-spawn": "~0.3.0",
+    "grunt-exec": "~0.4.3",
+    "colors": "~0.6.2",
+    "uglify-js": "~2.4.12"
+  }
+}
