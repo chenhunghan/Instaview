@@ -1,45 +1,29 @@
-#
-# Flowchart module.
-#
+removeClassSVG = (obj, remove) ->
+  classes = obj.attr("class")
+  return false  unless classes
+  index = classes.search(remove)
 
-#
-# Directive that generates the rendered chart from the data model.
-#
+  # if the class already doesn't exist, return false now
+  if index is -1
+    false
+  else
 
-#
-# Controller for the flowchart directive.
-# Having a separate controller is better for unit testing, otherwise
-# it is painful to unit test a directive without instantiating the DOM 
-# (which is possible, just not ideal).
-#
+    # string manipulation to remove the class
+    classes = classes.substring(0, index) + classes.substring((index + remove.length), classes.length)
 
-#
-# Directive that allows the chart to be edited as json in a textarea.
-#
+    # set the new string as the object's class
+    obj.attr "class", classes
+    true
 
-#
-# Serialize the data model as json and update the textarea.
-#
+hasClassSVG = (obj, has) ->
+  classes = obj.attr("class")
+  return false  unless classes
+  index = classes.search(has)
+  if index is -1
+    false
+  else
+    true
 
-#
-# First up, set the initial value of the textarea.
-#
-
-#
-# Watch for changes in the data model and update the textarea whenever necessary.
-#
-
-#
-# Handle the change event from the textarea and update the data model
-# from the modified json.
-#
-
-#
-# Controller for the flowchart directive.
-# Having a separate controller is better for unit testing, otherwise
-# it is painful to unit test a directive without instantiating the DOM 
-# (which is possible, just not ideal).
-#
 angular.module("flowChart", ["dragging"]).directive("flowChart", ->
   restrict: "E"
   templateUrl: "flowchart/flowchart_template.html"

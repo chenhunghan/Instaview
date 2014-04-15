@@ -6,7 +6,6 @@ flowchart = {}
 
 # Module.
 (->
-  
   #
   # Width of a node.
   #
