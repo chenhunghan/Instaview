@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<title>IntraView</title>
+        <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+	</head>	
+	<body 
+		ng-app="app" 
+		ng-controller="AppCtrl"
+		mouse-capture
+		ng-keydown="keyDown($event)"
+		ng-keyup="keyUp($event)"
+		>
+
+		<div style="width: 100%">
+		    <div>
+    			<button
+    				ng-click="addNewNode()"
+    				title="Add a new node to the chart"
+    				>
+    				Add Node
+				</button>
+    			<button
+    				ng-click="addNewInputConnector()"
+    				ng-disabled="chartViewModel.getSelectedNodes().length == 0"
+    				title="Add a new input connector to the selected node"
+    				>
+    				Add Input Connector
+				</button>
+    			<button
+    				ng-click="addNewOutputConnector()"
+    				ng-disabled="chartViewModel.getSelectedNodes().length == 0"
+    				title="Add a new output connector to the selected node"
+    				>
+    				Add Output Connector
+				</button>
+    			<button
+    				ng-click="deleteSelected()"
+    				ng-disabled="chartViewModel.getSelectedNodes().length == 0 && chartViewModel.getSelectedConnections().length == 0"
+    				title="Delete selected nodes and connections"
+    				>
+    				Delete Selected
+				</button>
+
+				<!--
+				This custom element defines the flowchart.
+				-->
+			    <flow-chart
+			      	chart="chartViewModel"
+			      	>
+			    </flow-chart>
+		    </div>
+		</div>
+
+		<link rel="stylesheet" type="text/css" href="app.css">
+		<!-- Library code. -->
+		<script src="lib/jquery-2.0.2.js" type="text/javascript"></script>
+		<script src="lib/angular.js" type="text/javascript"></script>
+		<!-- Flowchart code. -->
+		<script src="debug.js" type="text/javascript"></script>
+		<script src="flowchart/svg_class.js" type="text/javascript"></script>
+		<script src="flowchart/mouse_capture_service.js" type="text/javascript"></script>
+		<script src="flowchart/drag_service.js" type="text/javascript"></script>
+		<script src="flowchart/viewmodel.js" type="text/javascript"></script>
+		<script src="flowchart/directive.js" type="text/javascript"></script>
+		<!-- App code. -->
+		<script src="app.js" type="text/javascript"></script>
+	</body>
+</html>
