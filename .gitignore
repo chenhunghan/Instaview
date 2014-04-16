@@ -1,2 +1,5 @@
 /node_modules/
 .idea/*
+main.coffee
+main.js
+main.map
