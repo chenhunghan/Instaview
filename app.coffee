@@ -1,7 +1,16 @@
 
-flowchart = {}
-# Module.
-(->
+# Debug utilities.
+throw new Error("debug object already defined!")  if typeof debug isnt "undefined"
+debug = {}
+# Assert that an object is valid.
+debug.assertObjectValid = (obj) ->
+  throw new Exception("Invalid object!")  unless obj
+  throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
+
+ngapp = angular.module("app", ["flowChart"])
+
+ngapp.service "flowchart", ->
+  flowchart = this
   # Width of a node.
   flowchart.nodeWidth = 250
   # Amount of space reserved for displaying the node's name.
@@ -402,15 +411,15 @@ flowchart = {}
       selectedConnections
     return
   return
-)()
 
-
-angular.module("app", ["flowChart"]).factory("prompt", ->
+ngapp.factory "prompt", ->
   prompt
-).controller "AppCtrl", [
+
+ngapp.controller "AppCtrl", [
   "$scope"
   "prompt"
-  AppCtrl = ($scope, prompt) ->
+  "flowchart"
+  AppCtrl = ($scope, prompt, flowchart) ->
     # Code for the delete key.
     deleteKeyCode = 46
     # Code for control key.
@@ -579,20 +588,9 @@ angular.module("app", ["flowChart"]).factory("prompt", ->
     $scope.deleteSelected = ->
       $scope.chartViewModel.deleteSelected()
       return
-
     # Create the view-model for the chart and attach to the scope.
     $scope.chartViewModel = new flowchart.ChartViewModel(chartDataModel)
 ]
-
-# Debug utilities.
-
-
-throw new Error("debug object already defined!")  if typeof debug isnt "undefined"
-debug = {}
-# Assert that an object is valid.
-debug.assertObjectValid = (obj) ->
-  throw new Exception("Invalid object!")  unless obj
-  throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
 
 removeClassSVG = (obj, remove) ->
   classes = obj.attr("class")
@@ -639,7 +637,7 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
     $(elem).bind "input propertychange", ->
       json = $(elem).val()
       dataModel = JSON.parse(json)
-      scope.viewModel = new flowchart.ChartViewModel(dataModel)
+      scope.viewModel = flowchart.ChartViewModel(dataModel)
       scope.$digest()
       return
     return
@@ -647,7 +645,8 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
   "$scope"
   "dragging"
   "$element"
-  FlowChartController = ($scope, dragging, $element) ->
+  "flowchart"
+  FlowChartController = ($scope, dragging, $element, flowchart) ->
     controller = this
     # Reference to the document and jQuery, can be overridden for testting.
     @document = document

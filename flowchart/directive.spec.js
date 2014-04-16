@@ -427,7 +427,3 @@
   });
 
 }).call(this);
-
-/*
-//@ sourceMappingURL=directive.spec.map
-*/
