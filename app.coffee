@@ -7,7 +7,7 @@ debug.assertObjectValid = (obj) ->
   throw new Exception("Invalid object!")  unless obj
   throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
 
-ngapp = angular.module("app", ["flowChart", "hmTouchEvents"])
+ngapp = angular.module("app", ["flowChart"])
 
 ngapp.service "flowchartModel", ->
   flowchart = this
@@ -528,8 +528,8 @@ ngapp.controller "AppCtrl", [
       newNodeDataModel =
         name: nodeName
         id: nextNodeID++
-        x: 0
-        y: 0
+        x: 50
+        y: 50
         inputConnectors: [
           {
             name: "X"

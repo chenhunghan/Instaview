@@ -17,7 +17,7 @@
     }
   };
 
-  ngapp = angular.module("app", ["flowChart", "hmTouchEvents"]);
+  ngapp = angular.module("app", ["flowChart"]);
 
   ngapp.service("flowchartModel", function() {
     var computeConnectionTangentOffset, createConnectorsViewModel, createNodesViewModel, flowchart;
@@ -567,8 +567,8 @@
         newNodeDataModel = {
           name: nodeName,
           id: nextNodeID++,
-          x: 0,
-          y: 0,
+          x: 50,
+          y: 50,
           inputConnectors: [
             {
               name: "X"
