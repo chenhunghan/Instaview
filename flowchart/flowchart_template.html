@@ -28,7 +28,7 @@
   <g
     ng-repeat="node in chart.nodes"
 
-    hm-drag="nodeMouseDown($event, node)"
+    hm-tap="nodeMouseDown($event, node)"
     ng-attr-transform="translate({{node.x()}}, {{node.y()}})"
     >
     <rect 
@@ -56,7 +56,7 @@
     <g
       ng-repeat="connector in node.inputConnectors"
 
-      hm-drag="connectorMouseDown($event, node, connector, $index, true)"
+      hm-tap="connectorMouseDown($event, node, connector, $index, true)"
       class="connector input-connector"
       >
       <text
