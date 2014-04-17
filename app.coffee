@@ -7,9 +7,9 @@ debug.assertObjectValid = (obj) ->
   throw new Exception("Invalid object!")  unless obj
   throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
 
-ngapp = angular.module("app", ["flowChart"])
+ngapp = angular.module("app", ["flowChart", "hmTouchEvents"])
 
-ngapp.service "flowchart", ->
+ngapp.service "flowchartModel", ->
   flowchart = this
   # Width of a node.
   flowchart.nodeWidth = 250
@@ -43,7 +43,6 @@ ngapp.service "flowchart", ->
     @parentNode = ->
       @_parentNode
     return
-
   # Create view model for a list of data models.
   createConnectorsViewModel = (connectorDataModels, x, parentNode) ->
     viewModels = []
@@ -418,8 +417,8 @@ ngapp.factory "prompt", ->
 ngapp.controller "AppCtrl", [
   "$scope"
   "prompt"
-  "flowchart"
-  AppCtrl = ($scope, prompt, flowchart) ->
+  "flowchartModel"
+  AppCtrl = ($scope, prompt, flowchartModel) ->
     # Code for the delete key.
     deleteKeyCode = 46
     # Code for control key.
@@ -501,7 +500,6 @@ ngapp.controller "AppCtrl", [
           nodeID: 1
           connectorIndex: 2
       ]
-
     # Event handler for key-down on the flowchart.
     $scope.keyDown = (evt) ->
       if evt.keyCode is ctrlKeyCode
@@ -509,7 +507,6 @@ ngapp.controller "AppCtrl", [
         evt.stopPropagation()
         evt.preventDefault()
       return
-
     # Event handler for key-up on the flowchart.
     $scope.keyUp = (evt) ->
       # Delete key.
@@ -523,7 +520,6 @@ ngapp.controller "AppCtrl", [
         evt.stopPropagation()
         evt.preventDefault()
       return
-
     # Add a new node to the chart.
     $scope.addNewNode = ->
       nodeName = prompt("Enter a node name:", "New node")
@@ -559,7 +555,6 @@ ngapp.controller "AppCtrl", [
 
       $scope.chartViewModel.addNode newNodeDataModel
       return
-
     # Add an input connector to selected nodes.
     $scope.addNewInputConnector = ->
       connectorName = prompt("Enter a connector name:", "New connector")
@@ -571,7 +566,6 @@ ngapp.controller "AppCtrl", [
         node.addInputConnector name: connectorName
         ++i
       return
-
     # Add an output connector to selected nodes.
     $scope.addNewOutputConnector = ->
       connectorName = prompt("Enter a connector name:", "New connector")
@@ -583,13 +577,12 @@ ngapp.controller "AppCtrl", [
         node.addOutputConnector name: connectorName
         ++i
       return
-
     # Delete selected nodes and connections.
     $scope.deleteSelected = ->
       $scope.chartViewModel.deleteSelected()
       return
     # Create the view-model for the chart and attach to the scope.
-    $scope.chartViewModel = new flowchart.ChartViewModel(chartDataModel)
+    $scope.chartViewModel = new flowchartModel.ChartViewModel(chartDataModel)
 ]
 
 removeClassSVG = (obj, remove) ->
@@ -645,8 +638,8 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
   "$scope"
   "dragging"
   "$element"
-  "flowchart"
-  FlowChartController = ($scope, dragging, $element, flowchart) ->
+  "flowchartModel"
+  FlowChartController = ($scope, dragging, $element, flowchartModel) ->
     controller = this
     # Reference to the document and jQuery, can be overridden for testting.
     @document = document
@@ -745,22 +738,17 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
         # Figure out if the mouse is over a connection.
         scope = controller.checkForHit(mouseOverElement, controller.connectionClass)
         $scope.mouseOverConnection = (if (scope and scope.connection) then scope.connection else null)
-
         # Don't attempt to mouse over anything else.
         return  if $scope.mouseOverConnection
-
       # Figure out if the mouse is over a connector.
       scope = controller.checkForHit(mouseOverElement, controller.connectorClass)
       $scope.mouseOverConnector = (if (scope and scope.connector) then scope.connector else null)
-
       # Don't attempt to mouse over anything else.
       return  if $scope.mouseOverConnector
-
       # Figure out if the mouse is over a node.
       scope = controller.checkForHit(mouseOverElement, controller.nodeClass)
       $scope.mouseOverNode = (if (scope and scope.node) then scope.node else null)
       return
-
     # Handle mousedown on a node.
     $scope.nodeMouseDown = (evt, node) ->
       chart = $scope.chart
@@ -775,7 +763,6 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
             chart.deselectAll()
             node.select()
           return
-
       # Dragging selected nodes... update their x,y coordinates.
         dragging: (x, y) ->
           curCoords = controller.translateCoordinates(x, y)
@@ -784,13 +771,11 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
           chart.updateSelectedNodesLocation deltaX, deltaY
           lastMouseCoords = curCoords
           return
-
       # The node wasn't dragged... it was clicked.
         clicked: ->
           chart.handleNodeClicked node, evt.ctrlKey
           return
       return
-
     # Handle mousedown on a connection.
     $scope.connectionMouseDown = (evt, connection) ->
       chart = $scope.chart
@@ -799,7 +784,6 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       evt.stopPropagation()
       evt.preventDefault()
       return
-
     # Handle mousedown on an input connector.
     $scope.connectorMouseDown = (evt, node, connector, connectorIndex, isInputConnector) ->
       # Initiate dragging out of a connection.
@@ -809,22 +793,22 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
         dragStarted: (x, y) ->
           curCoords = controller.translateCoordinates(x, y)
           $scope.draggingConnection = true
-          $scope.dragPoint1 = flowchart.computeConnectorPos(node, connectorIndex, isInputConnector)
+          $scope.dragPoint1 = flowchartModel.computeConnectorPos(node, connectorIndex, isInputConnector)
           $scope.dragPoint2 =
             x: curCoords.x
             y: curCoords.y
-          $scope.dragTangent1 = flowchart.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2)
-          $scope.dragTangent2 = flowchart.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2)
+          $scope.dragTangent1 = flowchartModel.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2)
+          $scope.dragTangent2 = flowchartModel.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2)
           return
       # Called on mousemove while dragging out a connection.
         dragging: (x, y, evt) ->
           startCoords = controller.translateCoordinates(x, y)
-          $scope.dragPoint1 = flowchart.computeConnectorPos(node, connectorIndex, isInputConnector)
+          $scope.dragPoint1 = flowchartModel.computeConnectorPos(node, connectorIndex, isInputConnector)
           $scope.dragPoint2 =
             x: startCoords.x
             y: startCoords.y
-          $scope.dragTangent1 = flowchart.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2)
-          $scope.dragTangent2 = flowchart.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2)
+          $scope.dragTangent1 = flowchartModel.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2)
+          $scope.dragTangent2 = flowchartModel.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2)
           return
       # Clean up when dragging has finished.
         dragEnded: ->

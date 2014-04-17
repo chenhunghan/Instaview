@@ -17,9 +17,9 @@
     }
   };
 
-  ngapp = angular.module("app", ["flowChart"]);
+  ngapp = angular.module("app", ["flowChart", "hmTouchEvents"]);
 
-  ngapp.service("flowchart", function() {
+  ngapp.service("flowchartModel", function() {
     var computeConnectionTangentOffset, createConnectorsViewModel, createNodesViewModel, flowchart;
     flowchart = this;
     flowchart.nodeWidth = 250;
@@ -464,7 +464,7 @@
   });
 
   ngapp.controller("AppCtrl", [
-    "$scope", "prompt", "flowchart", AppCtrl = function($scope, prompt, flowchart) {
+    "$scope", "prompt", "flowchartModel", AppCtrl = function($scope, prompt, flowchartModel) {
       var aKeyCode, chartDataModel, ctrlDown, ctrlKeyCode, deleteKeyCode, escKeyCode, nextNodeID;
       deleteKeyCode = 46;
       ctrlKeyCode = 65;
@@ -625,7 +625,7 @@
       $scope.deleteSelected = function() {
         $scope.chartViewModel.deleteSelected();
       };
-      return $scope.chartViewModel = new flowchart.ChartViewModel(chartDataModel);
+      return $scope.chartViewModel = new flowchartModel.ChartViewModel(chartDataModel);
     }
   ]);
 
@@ -696,7 +696,7 @@
       }
     };
   }).controller("FlowChartController", [
-    "$scope", "dragging", "$element", "flowchart", FlowChartController = function($scope, dragging, $element, flowchart) {
+    "$scope", "dragging", "$element", "flowchartModel", FlowChartController = function($scope, dragging, $element, flowchartModel) {
       var controller;
       controller = this;
       this.document = document;
@@ -837,24 +837,24 @@
             var curCoords;
             curCoords = controller.translateCoordinates(x, y);
             $scope.draggingConnection = true;
-            $scope.dragPoint1 = flowchart.computeConnectorPos(node, connectorIndex, isInputConnector);
+            $scope.dragPoint1 = flowchartModel.computeConnectorPos(node, connectorIndex, isInputConnector);
             $scope.dragPoint2 = {
               x: curCoords.x,
               y: curCoords.y
             };
-            $scope.dragTangent1 = flowchart.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
-            $scope.dragTangent2 = flowchart.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
+            $scope.dragTangent1 = flowchartModel.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
+            $scope.dragTangent2 = flowchartModel.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
           },
           dragging: function(x, y, evt) {
             var startCoords;
             startCoords = controller.translateCoordinates(x, y);
-            $scope.dragPoint1 = flowchart.computeConnectorPos(node, connectorIndex, isInputConnector);
+            $scope.dragPoint1 = flowchartModel.computeConnectorPos(node, connectorIndex, isInputConnector);
             $scope.dragPoint2 = {
               x: startCoords.x,
               y: startCoords.y
             };
-            $scope.dragTangent1 = flowchart.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
-            $scope.dragTangent2 = flowchart.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
+            $scope.dragTangent1 = flowchartModel.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
+            $scope.dragTangent2 = flowchartModel.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
           },
           dragEnded: function() {
             if ($scope.mouseOverConnector && $scope.mouseOverConnector !== connector) {
@@ -872,3 +872,7 @@
   ]);
 
 }).call(this);
+
+/*
+//@ sourceMappingURL=app.map
+*/

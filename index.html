@@ -8,6 +8,8 @@
 		mouse-capture
 		ng-keydown="keyDown($event)"
 		ng-keyup="keyUp($event)"
+        hm-tap="console.log('sssss')"
+        hm-drag="console.log('sssss')"
 		>
 		<div style="width: 100%">
 		    <div>
@@ -52,6 +54,8 @@
 		<!-- Library code. -->
 		<script src="lib/jquery-2.0.2.js" type="text/javascript"></script>
 		<script src="lib/angular.js" type="text/javascript"></script>
+        <script src="lib/hammer.js" type="text/javascript"></script>
+        <script src="lib/angular-hammer.js" type="text/javascript"></script>
 		<!-- Flowchart code. -->
 		<script src="flowchart/mouse_capture_service.js" type="text/javascript"></script>
 		<script src="flowchart/drag_service.js" type="text/javascript"></script>
