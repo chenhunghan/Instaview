@@ -465,8 +465,9 @@
 
   ngapp.controller("AppCtrl", [
     "$scope", "prompt", "flowchartDataModel", AppCtrl = function($scope, prompt, flowchartDataModel) {
-      var ADown, aKeyCode, chartDataModel, ctrlDown, ctrlKeyCode, ctrlKeyCodeMac, deleteKeyCode, escKeyCode, nextNodeID;
+      var ADown, aKeyCode, chartDataModel, ctrlDown, ctrlKeyCode, ctrlKeyCodeMac, deleteKeyCode, deleteKeyCodeMac, escKeyCode, nextNodeID, preventDefaultAction;
       deleteKeyCode = 46;
+      deleteKeyCodeMac = 8;
       ctrlKeyCode = 17;
       ctrlKeyCodeMac = 91;
       ctrlDown = false;
@@ -540,41 +541,41 @@
       $scope.print = function() {
         return console.log($scope.chartViewModel.data);
       };
+      preventDefaultAction = function(evt) {
+        evt.stopPropagation();
+        return evt.preventDefault();
+      };
       $scope.keyDown = function(evt) {
-        console.log(evt.keyCode === ctrlKeyCodeMac);
         if ((evt.keyCode === ctrlKeyCode) || (evt.keyCode === ctrlKeyCodeMac)) {
+          preventDefaultAction(evt);
           ctrlDown = true;
-          evt.stopPropagation();
-          evt.preventDefault();
         }
         if (evt.keyCode === aKeyCode) {
-          evt.stopPropagation();
-          evt.preventDefault();
-          return ADown = true;
+          preventDefaultAction(evt);
+          ADown = true;
+        }
+        if (evt.keyCode === deleteKeyCodeMac) {
+          preventDefaultAction(evt);
+        }
+        if (ADown && ctrlDown) {
+          return $scope.chartViewModel.selectAll();
         }
       };
       $scope.keyUp = function(evt) {
-        console.log(evt);
-        if (evt.keyCode === deleteKeyCode) {
+        if ((evt.keyCode === deleteKeyCode) || (evt.keyCode === deleteKeyCodeMac)) {
+          preventDefaultAction(evt);
           $scope.chartViewModel.deleteSelected();
-        }
-        if (ADown && ctrlDown) {
-          evt.stopPropagation();
-          evt.preventDefault();
-          $scope.chartViewModel.selectAll();
         }
         if (evt.keyCode === escKeyCode) {
           $scope.chartViewModel.deselectAll();
         }
         if ((evt.keyCode === ctrlKeyCode) || (evt.keyCode === ctrlKeyCodeMac)) {
+          preventDefaultAction(evt);
           ctrlDown = false;
-          evt.stopPropagation();
-          evt.preventDefault();
         }
         if (evt.keyCode === aKeyCode) {
-          ADown = false;
-          evt.stopPropagation();
-          return evt.preventDefault();
+          preventDefaultAction(evt);
+          return ADown = false;
         }
       };
       $scope.addNewNode = function() {

@@ -419,6 +419,7 @@ ngapp.controller "AppCtrl", [
   AppCtrl = ($scope, prompt, flowchartDataModel) ->
     # Code for the delete key.
     deleteKeyCode = 46
+    deleteKeyCodeMac = 8
     # Code for control key.
     ctrlKeyCode = 17
     ctrlKeyCodeMac = 91
@@ -500,45 +501,44 @@ ngapp.controller "AppCtrl", [
           nodeID: 1
           connectorIndex: 2
       ]
-    # Event handler for key-down on the flowchart.
     $scope.print = () ->
       console.log $scope.chartViewModel.data
+    # Event handler for key-down on the flowchart.
+    preventDefaultAction = (evt) ->
+      #stop event bubbles
+      evt.stopPropagation()
+      #stop native event from happening
+      evt.preventDefault()
     $scope.keyDown = (evt) ->
-      console.log (evt.keyCode is ctrlKeyCodeMac)
       if (evt.keyCode is ctrlKeyCode) or (evt.keyCode is ctrlKeyCodeMac)
+        preventDefaultAction(evt)
         ctrlDown = true
-        #stop event bubbles
-        evt.stopPropagation()
-        #stop native event from happening
-        evt.preventDefault()
       if evt.keyCode is aKeyCode
-        evt.stopPropagation()
-        evt.preventDefault()
+        preventDefaultAction(evt)
         ADown = true
-    # Event handler for key-up on the flowchart.
-    $scope.keyUp = (evt) ->
-      console.log evt
-      # Delete key.
-      $scope.chartViewModel.deleteSelected()  if evt.keyCode is deleteKeyCode
+      if evt.keyCode is deleteKeyCodeMac
+        preventDefaultAction(evt)
       # Ctrl + A
       if ADown and ctrlDown
-        evt.stopPropagation()
-        evt.preventDefault()
         $scope.chartViewModel.selectAll()
+    # Event handler for key-up on the flowchart.
+    $scope.keyUp = (evt) ->
+      # Delete key.
+      if (evt.keyCode is deleteKeyCode) or (evt.keyCode is deleteKeyCodeMac)
+        preventDefaultAction(evt)
+        $scope.chartViewModel.deleteSelected()
       # Escape.
       $scope.chartViewModel.deselectAll()  if evt.keyCode is escKeyCode
       if (evt.keyCode is ctrlKeyCode) or (evt.keyCode is ctrlKeyCodeMac)
+        preventDefaultAction(evt)
         ctrlDown = false
-        evt.stopPropagation()
-        evt.preventDefault()
       if evt.keyCode is aKeyCode
+        preventDefaultAction(evt)
         ADown = false
-        evt.stopPropagation()
-        evt.preventDefault()
     # Add a new node to the chart.
     $scope.addNewNode = ->
       nodeName = prompt("Enter a node name:", "New node")
-      return  unless nodeName
+      return unless nodeName
       # Template for a new node.
       newNodeDataModel =
         name: nodeName
