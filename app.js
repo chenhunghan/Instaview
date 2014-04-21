@@ -17,7 +17,7 @@
     }
   };
 
-  ngapp = angular.module("app", ["flowChart"]);
+  ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap']);
 
   ngapp.service("flowchartDataModel", function() {
     var computeConnectionTangentOffset, createConnectorsViewModel, createNodesViewModel, flowchart;
@@ -558,7 +558,10 @@
           preventDefaultAction(evt);
         }
         if (ADown && ctrlDown) {
-          return $scope.chartViewModel.selectAll();
+          $scope.chartViewModel.selectAll();
+        }
+        if (ctrlDown) {
+          return console.log($scope.chartViewModel);
         }
       };
       $scope.keyUp = function(evt) {

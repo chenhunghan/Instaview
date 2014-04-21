@@ -7,7 +7,7 @@ debug.assertObjectValid = (obj) ->
   throw new Exception("Invalid object!")  unless obj
   throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
 
-ngapp = angular.module("app", ["flowChart"])
+ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap'])
 
 ngapp.service "flowchartDataModel", ->
   flowchart = this
@@ -516,11 +516,11 @@ ngapp.controller "AppCtrl", [
       if evt.keyCode is aKeyCode
         preventDefaultAction(evt)
         ADown = true
-      if evt.keyCode is deleteKeyCodeMac
-        preventDefaultAction(evt)
+      if evt.keyCode is deleteKeyCodeMac then preventDefaultAction(evt)
       # Ctrl + A
-      if ADown and ctrlDown
-        $scope.chartViewModel.selectAll()
+      if ADown and ctrlDown then $scope.chartViewModel.selectAll()
+      if ctrlDown
+        console.log $scope.chartViewModel
     # Event handler for key-up on the flowchart.
     $scope.keyUp = (evt) ->
       # Delete key.
@@ -567,7 +567,6 @@ ngapp.controller "AppCtrl", [
             name: "3"
           }
         ]
-
       $scope.chartViewModel.addNode newNodeDataModel
       return
     # Add an input connector to selected nodes.
