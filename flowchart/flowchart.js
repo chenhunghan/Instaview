@@ -42,34 +42,8 @@
       },
       controller: "FlowChartController"
     };
-  }).directive("chartJsonEdit", function() {
-    return {
-      restrict: "A",
-      scope: {
-        viewModel: "="
-      },
-      link: function(scope, elem, attr) {
-        var updateJson;
-        updateJson = function() {
-          var json;
-          if (scope.viewModel) {
-            json = JSON.stringify(scope.viewModel.data, null, 4);
-            $(elem).val(json);
-          }
-        };
-        updateJson();
-        scope.$watch("viewModel.data", updateJson, true);
-        $(elem).bind("input propertychange", function() {
-          var dataModel, json;
-          json = $(elem).val();
-          dataModel = JSON.parse(json);
-          scope.viewModel = new flowchart.ChartViewModel(dataModel);
-          scope.$digest();
-        });
-      }
-    };
   }).controller("FlowChartController", [
-    "$scope", "dragging", "$element", FlowChartController = function($scope, dragging, $element) {
+    "$scope", "dragging", "$element", "flowchartDataModel", FlowChartController = function($scope, dragging, $element, flowchartDataModel) {
       var controller;
       controller = this;
       this.document = document;
@@ -210,24 +184,24 @@
             var curCoords;
             curCoords = controller.translateCoordinates(x, y);
             $scope.draggingConnection = true;
-            $scope.dragPoint1 = flowchart.computeConnectorPos(node, connectorIndex, isInputConnector);
+            $scope.dragPoint1 = flowchartDataModel.computeConnectorPos(node, connectorIndex, isInputConnector);
             $scope.dragPoint2 = {
               x: curCoords.x,
               y: curCoords.y
             };
-            $scope.dragTangent1 = flowchart.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
-            $scope.dragTangent2 = flowchart.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
+            $scope.dragTangent1 = flowchartDataModel.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
+            $scope.dragTangent2 = flowchartDataModel.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
           },
           dragging: function(x, y, evt) {
             var startCoords;
             startCoords = controller.translateCoordinates(x, y);
-            $scope.dragPoint1 = flowchart.computeConnectorPos(node, connectorIndex, isInputConnector);
+            $scope.dragPoint1 = flowchartDataModel.computeConnectorPos(node, connectorIndex, isInputConnector);
             $scope.dragPoint2 = {
               x: startCoords.x,
               y: startCoords.y
             };
-            $scope.dragTangent1 = flowchart.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
-            $scope.dragTangent2 = flowchart.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
+            $scope.dragTangent1 = flowchartDataModel.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
+            $scope.dragTangent2 = flowchartDataModel.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
           },
           dragEnded: function() {
             if ($scope.mouseOverConnector && $scope.mouseOverConnector !== connector) {
@@ -247,5 +221,5 @@
 }).call(this);
 
 /*
-//@ sourceMappingURL=directive.map
+//@ sourceMappingURL=flowchart.map
 */

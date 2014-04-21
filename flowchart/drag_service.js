@@ -2,7 +2,7 @@
 (function() {
   angular.module("dragging", ["mouseCapture"]).factory("dragging", function($rootScope, mouseCapture) {
     var threshold;
-    threshold = 5;
+    threshold = 1;
     return {
       startDrag: function(evt, config) {
         var dragging, mouseMove, mouseUp, released, x, y;

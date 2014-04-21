@@ -22,6 +22,7 @@ Styles for nodes and connectors.
 .node-rect {
 	stroke: black;
 	stroke-width: 2;
+    z-index: 1;
 }
 
 .mouseover-node-rect {
@@ -38,6 +39,7 @@ Styles for nodes and connectors.
     fill: white;
     stroke: black;
     stroke-width: 2;
+    z-index:2;
 }
 
 .mouseover-connector-circle {
@@ -57,6 +59,7 @@ Style for connections.
 	stroke: gray;
 	stroke-width: 4;
 	fill: transparent;
+    z-index:3;
 }	
 
 .mouseover-connection-line {
