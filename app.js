@@ -459,13 +459,34 @@
     };
   });
 
-  ngapp.factory("prompt", function() {
-    return prompt;
+  ngapp.service("prompt", function($modal) {
+    return this.show = function(title, value, $scope, cb) {
+      var Modal;
+      $scope.title = title;
+      Modal = $modal({
+        scope: $scope,
+        template: "modal_input.html"
+      });
+      $scope.hide = function(e) {
+        $(".modal").hide();
+        return Modal.hide();
+      };
+      $scope.printdata = function() {
+        return console.log($scope.value);
+      };
+      Modal.$promise.then(function() {
+        return Modal.show();
+      });
+      return $scope.confirm = function() {
+        $scope.hide();
+        return cb();
+      };
+    };
   });
 
   ngapp.controller("AppCtrl", [
     "$scope", "prompt", "flowchartDataModel", AppCtrl = function($scope, prompt, flowchartDataModel) {
-      var ADown, aKeyCode, chartDataModel, ctrlDown, ctrlKeyCode, ctrlKeyCodeMac, deleteKeyCode, deleteKeyCodeMac, escKeyCode, nextNodeID, preventDefaultAction;
+      var ADown, InitialNodeX, InitialNodeY, aKeyCode, chartDataModel, ctrlDown, ctrlKeyCode, ctrlKeyCodeMac, deleteKeyCode, deleteKeyCodeMac, escKeyCode, nextNodeID, preventDefaultAction;
       deleteKeyCode = 46;
       deleteKeyCodeMac = 8;
       ctrlKeyCode = 17;
@@ -474,7 +495,9 @@
       ADown = false;
       aKeyCode = 65;
       escKeyCode = 27;
-      nextNodeID = 10;
+      nextNodeID = 0;
+      InitialNodeX = 50;
+      InitialNodeY = 50;
       chartDataModel = {
         nodes: [
           {
@@ -561,7 +584,7 @@
           $scope.chartViewModel.selectAll();
         }
         if (ctrlDown) {
-          return console.log($scope.chartViewModel);
+          return console.log('control down');
         }
       };
       $scope.keyUp = function(evt) {
@@ -582,36 +605,38 @@
         }
       };
       $scope.addNewNode = function() {
-        var newNodeDataModel, nodeName;
-        nodeName = prompt("Enter a node name:", "New node");
-        if (!nodeName) {
-          return;
-        }
-        newNodeDataModel = {
-          name: nodeName,
-          id: nextNodeID++,
-          x: 50,
-          y: 50,
-          inputConnectors: [
-            {
-              name: "X"
-            }, {
-              name: "Y"
-            }, {
-              name: "Z"
-            }
-          ],
-          outputConnectors: [
-            {
-              name: "1"
-            }, {
-              name: "2"
-            }, {
-              name: "3"
-            }
-          ]
+        var cb;
+        cb = function() {
+          var newNodeDataModel;
+          InitialNodeX = InitialNodeX + 15;
+          InitialNodeY = InitialNodeY + 15;
+          newNodeDataModel = {
+            name: $scope.value,
+            id: nextNodeID++,
+            x: InitialNodeX,
+            y: InitialNodeY,
+            inputConnectors: [
+              {
+                name: "X"
+              }, {
+                name: "Y"
+              }, {
+                name: "Z"
+              }
+            ],
+            outputConnectors: [
+              {
+                name: "1"
+              }, {
+                name: "2"
+              }, {
+                name: "3"
+              }
+            ]
+          };
+          return $scope.chartViewModel.addNode(newNodeDataModel);
         };
-        $scope.chartViewModel.addNode(newNodeDataModel);
+        return prompt("Enter a node name:", "New node", $scope, cb);
       };
       $scope.addNewInputConnector = function() {
         var connectorName, i, node, selectedNodes;

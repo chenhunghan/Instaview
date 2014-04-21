@@ -410,8 +410,22 @@ ngapp.service "flowchartDataModel", ->
       selectedConnections
     return
   return
-ngapp.factory "prompt", ->
-  prompt
+ngapp.service "prompt", ($modal) ->
+  @show = (title, value, $scope, cb) ->
+    $scope.title = title
+    Modal = $modal
+      scope: $scope
+      template: "modal_input.html"
+    $scope.hide = (e) ->
+      $(".modal").hide()
+      Modal.hide()
+    $scope.printdata = () ->
+      console.log $scope.value
+    Modal.$promise.then ->
+      Modal.show()
+    $scope.confirm = () ->
+      $scope.hide()
+      cb()
 ngapp.controller "AppCtrl", [
   "$scope"
   "prompt"
@@ -431,7 +445,10 @@ ngapp.controller "AppCtrl", [
     # Code for esc key.
     escKeyCode = 27
     # Selects the next node id.
-    nextNodeID = 10
+    nextNodeID = 0
+    #initail node pos
+    InitialNodeX = 50
+    InitialNodeY = 50
     # Setup the data-model for the chart.
     chartDataModel =
       nodes: [
@@ -520,7 +537,9 @@ ngapp.controller "AppCtrl", [
       # Ctrl + A
       if ADown and ctrlDown then $scope.chartViewModel.selectAll()
       if ctrlDown
-        console.log $scope.chartViewModel
+        console.log 'control down'
+        #MUTIPLY SELECTION
+        #console.log $scope.chartViewModel
     # Event handler for key-up on the flowchart.
     $scope.keyUp = (evt) ->
       # Delete key.
@@ -536,43 +555,46 @@ ngapp.controller "AppCtrl", [
         preventDefaultAction(evt)
         ADown = false
     # Add a new node to the chart.
+
     $scope.addNewNode = ->
-      nodeName = prompt("Enter a node name:", "New node")
-      return unless nodeName
-      # Template for a new node.
-      newNodeDataModel =
-        name: nodeName
-        id: nextNodeID++
-        x: 50
-        y: 50
-        inputConnectors: [
-          {
-            name: "X"
-          }
-          {
-            name: "Y"
-          }
-          {
-            name: "Z"
-          }
-        ]
-        outputConnectors: [
-          {
-            name: "1"
-          }
-          {
-            name: "2"
-          }
-          {
-            name: "3"
-          }
-        ]
-      $scope.chartViewModel.addNode newNodeDataModel
-      return
+
+      cb = () ->
+        InitialNodeX = InitialNodeX + 15
+        InitialNodeY = InitialNodeY + 15
+        # Template for a new node.
+        newNodeDataModel =
+          name: $scope.value
+          id: nextNodeID++
+          x: InitialNodeX
+          y: InitialNodeY
+          inputConnectors: [
+            {
+              name: "X"
+            }
+            {
+              name: "Y"
+            }
+            {
+              name: "Z"
+            }
+          ]
+          outputConnectors: [
+            {
+              name: "1"
+            }
+            {
+              name: "2"
+            }
+            {
+              name: "3"
+            }
+          ]
+        $scope.chartViewModel.addNode newNodeDataModel
+      prompt("Enter a node name:", "New node", $scope, cb)
     # Add an input connector to selected nodes.
     $scope.addNewInputConnector = ->
       connectorName = prompt("Enter a connector name:", "New connector")
-      return  unless connectorName
+      return unless connectorName
       selectedNodes = $scope.chartViewModel.getSelectedNodes()
       i = 0
       while i < selectedNodes.length
