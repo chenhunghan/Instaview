@@ -41,7 +41,7 @@
     return {
       restrict: "A",
       controller: function($scope, $element, $attrs, mouseCapture) {
-        mouseCapture.registerElement($element);
+        return mouseCapture.registerElement($element);
       }
     };
   });

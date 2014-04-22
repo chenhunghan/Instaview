@@ -355,9 +355,9 @@
           ++i;
         }
       };
-      this.handleNodeClicked = function(node, ctrlKey) {
+      this.handleNodeClicked = function(node, evt) {
         var nodeIndex;
-        if (ctrlKey) {
+        if (evt) {
           node.toggleSelected();
         } else {
           this.deselectAll();
@@ -569,7 +569,6 @@
         return console.log($scope.chartViewModel.data);
       };
       preventDefaultAction = function(evt) {
-        evt.stopPropagation();
         return evt.preventDefault();
       };
       $scope.keyDown = function(evt) {
@@ -592,19 +591,17 @@
         }
       };
       $scope.keyUp = function(evt) {
+        console.log(evt);
         if ((evt.keyCode === deleteKeyCode) || (evt.keyCode === deleteKeyCodeMac)) {
-          preventDefaultAction(evt);
           $scope.chartViewModel.deleteSelected();
         }
         if (evt.keyCode === escKeyCode) {
           $scope.chartViewModel.deselectAll();
         }
         if ((evt.keyCode === ctrlKeyCode) || (evt.keyCode === ctrlKeyCodeMac)) {
-          preventDefaultAction(evt);
           ctrlDown = false;
         }
         if (evt.keyCode === aKeyCode) {
-          preventDefaultAction(evt);
           return ADown = false;
         }
       };
@@ -704,6 +701,23 @@
       return $scope.chartViewModel = new flowchartDataModel.ChartViewModel(chartDataModel);
     }
   ]);
+
+  ngapp.directive("ngRightClick", function($parse) {
+    return function(scope, element, attrs) {
+      var fn;
+      fn = $parse(attrs.ngRightClick);
+      return element.bind("contextmenu", function(event) {
+        return scope.$apply(function() {
+          event.preventDefault();
+          return fn(scope, {
+            $event: event
+          });
+        });
+      });
+    };
+  });
+
+  angular.module();
 
 }).call(this);
 

@@ -8,6 +8,7 @@ debug.assertObjectValid = (obj) ->
   throw new Exception("Invalid object!")  unless obj
   throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
 ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap'])
+
 ngapp.service "flowchartDataModel", ->
   flowchart = this
   # Width of a node.
@@ -305,8 +306,8 @@ ngapp.service "flowchartDataModel", ->
         ++i
       return
     # Handle mouse click on a particular node.
-    @handleNodeClicked = (node, ctrlKey) ->
-      if ctrlKey
+    @handleNodeClicked = (node, evt) ->
+      if evt
         node.toggleSelected()
       else
         @deselectAll()
@@ -526,7 +527,7 @@ ngapp.controller "AppCtrl", [
     # Event handler for key-down on the flowchart.
     preventDefaultAction = (evt) ->
       #stop event bubbles
-      evt.stopPropagation()
+      #evt.stopPropagation()
       #stop native event from happening
       evt.preventDefault()
     $scope.keyDown = (evt) ->
@@ -536,7 +537,8 @@ ngapp.controller "AppCtrl", [
       if evt.keyCode is aKeyCode
         preventDefaultAction(evt)
         ADown = true
-      if evt.keyCode is deleteKeyCodeMac then preventDefaultAction(evt)
+      if evt.keyCode is deleteKeyCodeMac
+        preventDefaultAction(evt)
       # Ctrl + A
       if ADown and ctrlDown then $scope.chartViewModel.selectAll()
       if ctrlDown
@@ -545,17 +547,15 @@ ngapp.controller "AppCtrl", [
         #console.log $scope.chartViewModel
     # Event handler for key-up on the flowchart.
     $scope.keyUp = (evt) ->
+      console.log evt
       # Delete key.
       if (evt.keyCode is deleteKeyCode) or (evt.keyCode is deleteKeyCodeMac)
-        preventDefaultAction(evt)
         $scope.chartViewModel.deleteSelected()
       # Escape.
       $scope.chartViewModel.deselectAll()  if evt.keyCode is escKeyCode
       if (evt.keyCode is ctrlKeyCode) or (evt.keyCode is ctrlKeyCodeMac)
-        preventDefaultAction(evt)
         ctrlDown = false
       if evt.keyCode is aKeyCode
-        preventDefaultAction(evt)
         ADown = false
     # Add a new node to the chart.
 
@@ -641,3 +641,13 @@ ngapp.controller "AppCtrl", [
     # Create the view-model for the chart and attach to the scope.
     $scope.chartViewModel = new flowchartDataModel.ChartViewModel(chartDataModel)
 ]
+
+ngapp.directive "ngRightClick", ($parse) ->
+  (scope, element, attrs) ->
+    fn = $parse(attrs.ngRightClick)
+    element.bind "contextmenu", (event) ->
+      scope.$apply ->
+        event.preventDefault()
+        fn scope,
+          $event: event
+angular.module()

@@ -143,31 +143,36 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       return
     # Handle mousedown on a node.
     $scope.nodeMouseDown = (evt, node) ->
-      chart = $scope.chart
-      lastMouseCoords = undefined
-      dragging.startDrag evt,
-        # Node dragging has commenced.
-        dragStarted: (x, y) ->
-          lastMouseCoords = controller.translateCoordinates(x, y)
-          # If nothing is selected when dragging starts,
-          # at least select the node we are dragging.
-          unless node.selected()
-            chart.deselectAll()
-            node.select()
+      switch evt.button
+        when 0
+          chart = $scope.chart
+          lastMouseCoords = undefined
+          dragging.startDrag evt,
+            # Node dragging has commenced.
+            dragStarted: (x, y) ->
+              lastMouseCoords = controller.translateCoordinates(x, y)
+              # If nothing is selected when dragging starts,
+              # at least select the node we are dragging.
+              unless node.selected()
+                chart.deselectAll()
+                node.select()
+              return
+          # Dragging selected nodes... update their x,y coordinates.
+            dragging: (x, y) ->
+              curCoords = controller.translateCoordinates(x, y)
+              deltaX = curCoords.x - lastMouseCoords.x
+              deltaY = curCoords.y - lastMouseCoords.y
+              chart.updateSelectedNodesLocation deltaX, deltaY
+              lastMouseCoords = curCoords
+              return
+          # The node wasn't dragged... it was clicked.
+            clicked: ->
+              chart.handleNodeClicked node, evt.ctrlKey
+              return
           return
-      # Dragging selected nodes... update their x,y coordinates.
-        dragging: (x, y) ->
-          curCoords = controller.translateCoordinates(x, y)
-          deltaX = curCoords.x - lastMouseCoords.x
-          deltaY = curCoords.y - lastMouseCoords.y
-          chart.updateSelectedNodesLocation deltaX, deltaY
-          lastMouseCoords = curCoords
-          return
-      # The node wasn't dragged... it was clicked.
-        clicked: ->
-          chart.handleNodeClicked node, evt.ctrlKey
-          return
-      return
+        when 2
+          console.log evt
+
     # Handle mousedown on a connection.
     $scope.connectionMouseDown = (evt, connection) ->
       chart = $scope.chart

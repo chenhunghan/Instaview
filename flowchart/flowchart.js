@@ -148,28 +148,34 @@
       };
       $scope.nodeMouseDown = function(evt, node) {
         var chart, lastMouseCoords;
-        chart = $scope.chart;
-        lastMouseCoords = void 0;
-        dragging.startDrag(evt, {
-          dragStarted: function(x, y) {
-            lastMouseCoords = controller.translateCoordinates(x, y);
-            if (!node.selected()) {
-              chart.deselectAll();
-              node.select();
-            }
-          },
-          dragging: function(x, y) {
-            var curCoords, deltaX, deltaY;
-            curCoords = controller.translateCoordinates(x, y);
-            deltaX = curCoords.x - lastMouseCoords.x;
-            deltaY = curCoords.y - lastMouseCoords.y;
-            chart.updateSelectedNodesLocation(deltaX, deltaY);
-            lastMouseCoords = curCoords;
-          },
-          clicked: function() {
-            chart.handleNodeClicked(node, evt.ctrlKey);
-          }
-        });
+        switch (evt.button) {
+          case 0:
+            chart = $scope.chart;
+            lastMouseCoords = void 0;
+            dragging.startDrag(evt, {
+              dragStarted: function(x, y) {
+                lastMouseCoords = controller.translateCoordinates(x, y);
+                if (!node.selected()) {
+                  chart.deselectAll();
+                  node.select();
+                }
+              },
+              dragging: function(x, y) {
+                var curCoords, deltaX, deltaY;
+                curCoords = controller.translateCoordinates(x, y);
+                deltaX = curCoords.x - lastMouseCoords.x;
+                deltaY = curCoords.y - lastMouseCoords.y;
+                chart.updateSelectedNodesLocation(deltaX, deltaY);
+                lastMouseCoords = curCoords;
+              },
+              clicked: function() {
+                chart.handleNodeClicked(node, evt.ctrlKey);
+              }
+            });
+            break;
+          case 2:
+            return console.log(evt);
+        }
       };
       $scope.connectionMouseDown = function(evt, connection) {
         var chart;

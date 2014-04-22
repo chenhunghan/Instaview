@@ -32,4 +32,3 @@ angular.module("mouseCapture", []).factory("mouseCapture", ($rootScope) ->
   controller: ($scope, $element, $attrs, mouseCapture) ->
     # Register the directives element as the mouse capture element.
     mouseCapture.registerElement $element
-    return
