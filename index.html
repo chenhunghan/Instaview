@@ -8,9 +8,6 @@
 	<body 
 		ng-app="app" 
 		ng-controller="AppCtrl"
-		mouse-capture
-		ng-keydown="keyDown($event)"
-		ng-keyup="keyUp($event)"
 		>
 		<div style="width: 100%">
 		    <div>
@@ -46,14 +43,18 @@
                     >
                     print
                  </button>
-
 				<!--
 				This custom element defines the flowchart.
 				-->
-			    <flow-chart
-			      	chart="chartViewModel"
-			      	>
-			    </flow-chart>
+                <div mouse-capture
+                     ng-keydown="keyDown($event)"
+                     ng-keyup="keyUp($event)"
+                >
+                    <flow-chart
+                        chart="chartViewModel"
+                        >
+                    </flow-chart>
+                </div>
 		    </div>
 		</div>
 		<!-- Library code. -->
