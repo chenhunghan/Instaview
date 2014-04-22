@@ -465,14 +465,18 @@
       $scope.title = title;
       Modal = $modal({
         scope: $scope,
+        animation: "am-fade-and-scale",
         template: "modal_input.html"
       });
-      $scope.hide = function(e) {
+      Modal.hide = function() {
         $(".modal").hide();
+        return $(".modal-backdrop").hide();
+      };
+      $scope.hide = function() {
         return Modal.hide();
       };
       $scope.printdata = function() {
-        return console.log($scope.value);
+        return console.log($scope.newValue);
       };
       Modal.$promise.then(function() {
         return Modal.show();
@@ -606,69 +610,93 @@
       };
       $scope.addNewNode = function() {
         var cb;
+        InitialNodeX = InitialNodeX + 15;
+        InitialNodeY = InitialNodeY + 15;
+        $scope.mutinode = false;
+        $scope.targetNode = {
+          name: "New Node",
+          id: nextNodeID++,
+          x: InitialNodeX,
+          y: InitialNodeY,
+          inputConnectors: [
+            {
+              name: "X"
+            }, {
+              name: "Y"
+            }, {
+              name: "Z"
+            }
+          ],
+          outputConnectors: [
+            {
+              name: "1"
+            }, {
+              name: "2"
+            }, {
+              name: "3"
+            }
+          ]
+        };
+        $scope.newValue = $scope.targetNode.name;
         cb = function() {
-          var newNodeDataModel;
-          InitialNodeX = InitialNodeX + 15;
-          InitialNodeY = InitialNodeY + 15;
-          newNodeDataModel = {
-            name: $scope.value,
-            id: nextNodeID++,
-            x: InitialNodeX,
-            y: InitialNodeY,
-            inputConnectors: [
-              {
-                name: "X"
-              }, {
-                name: "Y"
-              }, {
-                name: "Z"
-              }
-            ],
-            outputConnectors: [
-              {
-                name: "1"
-              }, {
-                name: "2"
-              }, {
-                name: "3"
-              }
-            ]
-          };
-          return $scope.chartViewModel.addNode(newNodeDataModel);
+          $scope.targetNode.name = $scope.newValue;
+          return $scope.chartViewModel.addNode($scope.targetNode);
         };
         return prompt("Enter a node name:", "New node", $scope, cb);
       };
       $scope.addNewInputConnector = function() {
-        var connectorName, i, node, selectedNodes;
-        connectorName = prompt("Enter a connector name:", "New connector");
-        if (!connectorName) {
-          return;
-        }
+        var cb, i, selectedNodes, _i, _len;
+        $scope.newValue = "New connector";
         selectedNodes = $scope.chartViewModel.getSelectedNodes();
-        i = 0;
-        while (i < selectedNodes.length) {
-          node = selectedNodes[i];
-          node.addInputConnector({
-            name: connectorName
-          });
-          ++i;
+        if (selectedNodes.length > 1) {
+          $scope.mutinode = true;
+          $scope.targetNodes = [];
+          for (_i = 0, _len = selectedNodes.length; _i < _len; _i++) {
+            i = selectedNodes[_i];
+            $scope.targetNodes.push(i.data.name);
+          }
+        } else {
+          $scope.targetNode = selectedNodes[0].data;
         }
+        cb = function() {
+          var node;
+          i = 0;
+          while (i < selectedNodes.length) {
+            node = selectedNodes[i];
+            node.addInputConnector({
+              name: $scope.newValue
+            });
+            ++i;
+          }
+        };
+        return prompt("Enter a connector name:", "", $scope, cb);
       };
       $scope.addNewOutputConnector = function() {
-        var connectorName, i, node, selectedNodes;
-        connectorName = prompt("Enter a connector name:", "New connector");
-        if (!connectorName) {
-          return;
-        }
+        var cb, i, selectedNodes, _i, _len;
+        $scope.newValue = "New connector";
         selectedNodes = $scope.chartViewModel.getSelectedNodes();
-        i = 0;
-        while (i < selectedNodes.length) {
-          node = selectedNodes[i];
-          node.addOutputConnector({
-            name: connectorName
-          });
-          ++i;
+        if (selectedNodes.length > 1) {
+          $scope.mutinode = true;
+          $scope.targetNodes = [];
+          for (_i = 0, _len = selectedNodes.length; _i < _len; _i++) {
+            i = selectedNodes[_i];
+            $scope.targetNodes.push(i.data.name);
+          }
+        } else {
+          $scope.targetNode = selectedNodes[0].data;
         }
+        cb = function() {
+          var node;
+          i = 0;
+          while (i < selectedNodes.length) {
+            node = selectedNodes[i];
+            node.addOutputConnector({
+              name: $scope.newValue
+            });
+            ++i;
+          }
+        };
+        return prompt("Enter a connector name:", "", $scope, cb);
       };
       $scope.deleteSelected = function() {
         $scope.chartViewModel.deleteSelected();

@@ -2,13 +2,12 @@
 # Debug utilities.
 throw new Error("debug object already defined!")  if typeof debug isnt "undefined"
 debug = {}
+
 # Assert that an object is valid.
 debug.assertObjectValid = (obj) ->
   throw new Exception("Invalid object!")  unless obj
   throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
-
 ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap'])
-
 ngapp.service "flowchartDataModel", ->
   flowchart = this
   # Width of a node.
@@ -415,12 +414,16 @@ ngapp.service "prompt", ($modal) ->
     $scope.title = title
     Modal = $modal
       scope: $scope
+      animation: "am-fade-and-scale"
       template: "modal_input.html"
-    $scope.hide = (e) ->
+    #The original Modal does not work properly, we have to change it as this:
+    Modal.hide = () ->
       $(".modal").hide()
+      $(".modal-backdrop").hide()
+    $scope.hide = () ->
       Modal.hide()
     $scope.printdata = () ->
-      console.log $scope.value
+      console.log $scope.newValue
     Modal.$promise.then ->
       Modal.show()
     $scope.confirm = () ->
@@ -557,62 +560,80 @@ ngapp.controller "AppCtrl", [
     # Add a new node to the chart.
 
     $scope.addNewNode = ->
-
+      InitialNodeX = InitialNodeX + 15
+      InitialNodeY = InitialNodeY + 15
+      $scope.mutinode = false
+      # Template for a new node.
+      $scope.targetNode =
+        name: "New Node"
+        id: nextNodeID++
+        x: InitialNodeX
+        y: InitialNodeY
+        inputConnectors: [
+          {
+            name: "X"
+          }
+          {
+            name: "Y"
+          }
+          {
+            name: "Z"
+          }
+        ]
+        outputConnectors: [
+          {
+            name: "1"
+          }
+          {
+            name: "2"
+          }
+          {
+            name: "3"
+          }
+        ]
+      $scope.newValue = $scope.targetNode.name
       cb = () ->
-        InitialNodeX = InitialNodeX + 15
-        InitialNodeY = InitialNodeY + 15
-        # Template for a new node.
-        newNodeDataModel =
-          name: $scope.value
-          id: nextNodeID++
-          x: InitialNodeX
-          y: InitialNodeY
-          inputConnectors: [
-            {
-              name: "X"
-            }
-            {
-              name: "Y"
-            }
-            {
-              name: "Z"
-            }
-          ]
-          outputConnectors: [
-            {
-              name: "1"
-            }
-            {
-              name: "2"
-            }
-            {
-              name: "3"
-            }
-          ]
-        $scope.chartViewModel.addNode newNodeDataModel
+        $scope.targetNode.name = $scope.newValue
+        $scope.chartViewModel.addNode $scope.targetNode
       prompt("Enter a node name:", "New node", $scope, cb)
     # Add an input connector to selected nodes.
     $scope.addNewInputConnector = ->
-      connectorName = prompt("Enter a connector name:", "New connector")
-      return unless connectorName
+      $scope.newValue = "New connector"
       selectedNodes = $scope.chartViewModel.getSelectedNodes()
-      i = 0
-      while i < selectedNodes.length
-        node = selectedNodes[i]
-        node.addInputConnector name: connectorName
-        ++i
-      return
+      if selectedNodes.length > 1
+        $scope.mutinode = true
+        $scope.targetNodes = []
+        for i in selectedNodes
+          $scope.targetNodes.push i.data.name
+      else
+        $scope.targetNode = selectedNodes[0].data
+      cb = () ->
+        i = 0
+        while i < selectedNodes.length
+          node = selectedNodes[i]
+          node.addInputConnector name: $scope.newValue
+          ++i
+        return
+      prompt("Enter a connector name:", "", $scope, cb)
     # Add an output connector to selected nodes.
     $scope.addNewOutputConnector = ->
-      connectorName = prompt("Enter a connector name:", "New connector")
-      return  unless connectorName
+      $scope.newValue = "New connector"
       selectedNodes = $scope.chartViewModel.getSelectedNodes()
-      i = 0
-      while i < selectedNodes.length
-        node = selectedNodes[i]
-        node.addOutputConnector name: connectorName
-        ++i
-      return
+      if selectedNodes.length > 1
+        $scope.mutinode = true
+        $scope.targetNodes = []
+        for i in selectedNodes
+          $scope.targetNodes.push i.data.name
+      else
+        $scope.targetNode = selectedNodes[0].data
+      cb = () ->
+        i = 0
+        while i < selectedNodes.length
+          node = selectedNodes[i]
+          node.addOutputConnector name: $scope.newValue
+          ++i
+        return
+      prompt("Enter a connector name:", "", $scope, cb)
     # Delete selected nodes and connections.
     $scope.deleteSelected = ->
       $scope.chartViewModel.deleteSelected()
