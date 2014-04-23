@@ -9,7 +9,7 @@ debug.assertObjectValid = (obj) ->
   throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
 ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap'])
 
-ngapp.service "flowchartDataModel", ->
+ngapp.service "flowchartDataModel", [ ()->
   flowchart = this
   # Width of a node.
   flowchart.nodeWidth = 250
@@ -410,7 +410,8 @@ ngapp.service "flowchartDataModel", ->
       selectedConnections
     return
   return
-ngapp.service "prompt", ($modal) ->
+]
+ngapp.service "prompt", ["$modal", ($modal) ->
   @show = (title, value, $scope, cb) ->
     $scope.title = title
     Modal = $modal
@@ -430,6 +431,7 @@ ngapp.service "prompt", ($modal) ->
     $scope.confirm = () ->
       $scope.hide()
       cb()
+]
 ngapp.controller "AppCtrl", [
   "$scope"
   "prompt"
@@ -527,7 +529,7 @@ ngapp.controller "AppCtrl", [
     # Event handler for key-down on the flowchart.
     preventDefaultAction = (evt) ->
       #stop event bubbles
-      #evt.stopPropagation()
+      evt.stopPropagation()
       #stop native event from happening
       evt.preventDefault()
     $scope.keyDown = (evt) ->
@@ -650,4 +652,3 @@ ngapp.directive "ngRightClick", ($parse) ->
         event.preventDefault()
         fn scope,
           $event: event
-angular.module()

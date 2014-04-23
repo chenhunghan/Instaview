@@ -89,38 +89,45 @@
         return point.matrixTransform(matrix.inverse());
       };
       $scope.mouseDown = function(evt) {
-        $scope.chart.deselectAll();
-        dragging.startDrag(evt, {
-          dragStarted: function(x, y) {
-            var startPoint;
-            $scope.dragSelecting = true;
-            startPoint = controller.translateCoordinates(x, y);
-            $scope.dragSelectionStartPoint = startPoint;
-            $scope.dragSelectionRect = {
-              x: startPoint.x,
-              y: startPoint.y,
-              width: 0,
-              height: 0
-            };
-          },
-          dragging: function(x, y) {
-            var curPoint, startPoint;
-            startPoint = $scope.dragSelectionStartPoint;
-            curPoint = controller.translateCoordinates(x, y);
-            $scope.dragSelectionRect = {
-              x: (curPoint.x > startPoint.x ? startPoint.x : curPoint.x),
-              y: (curPoint.y > startPoint.y ? startPoint.y : curPoint.y),
-              width: (curPoint.x > startPoint.x ? curPoint.x - startPoint.x : startPoint.x - curPoint.x),
-              height: (curPoint.y > startPoint.y ? curPoint.y - startPoint.y : startPoint.y - curPoint.y)
-            };
-          },
-          dragEnded: function() {
-            $scope.dragSelecting = false;
-            $scope.chart.applySelectionRect($scope.dragSelectionRect);
-            delete $scope.dragSelectionStartPoint;
-            delete $scope.dragSelectionRect;
-          }
-        });
+        switch (evt.button) {
+          case 0:
+            $scope.chart.deselectAll();
+            return dragging.startDrag(evt, {
+              dragStarted: function(x, y) {
+                var startPoint;
+                $scope.dragSelecting = true;
+                startPoint = controller.translateCoordinates(x, y);
+                $scope.dragSelectionStartPoint = startPoint;
+                $scope.dragSelectionRect = {
+                  x: startPoint.x,
+                  y: startPoint.y,
+                  width: 0,
+                  height: 0
+                };
+              },
+              dragging: function(x, y) {
+                var curPoint, startPoint;
+                startPoint = $scope.dragSelectionStartPoint;
+                curPoint = controller.translateCoordinates(x, y);
+                $scope.dragSelectionRect = {
+                  x: (curPoint.x > startPoint.x ? startPoint.x : curPoint.x),
+                  y: (curPoint.y > startPoint.y ? startPoint.y : curPoint.y),
+                  width: (curPoint.x > startPoint.x ? curPoint.x - startPoint.x : startPoint.x - curPoint.x),
+                  height: (curPoint.y > startPoint.y ? curPoint.y - startPoint.y : startPoint.y - curPoint.y)
+                };
+              },
+              dragEnded: function() {
+                $scope.dragSelecting = false;
+                $scope.chart.applySelectionRect($scope.dragSelectionRect);
+                delete $scope.dragSelectionStartPoint;
+                delete $scope.dragSelectionRect;
+              }
+            });
+          case 2:
+            if (evt.target.attributes["class"].nodeValue && evt.target.attributes["class"].nodeValue === 'draggable-container') {
+              return console.log('right click on flowchart.');
+            }
+        }
       };
       $scope.mouseMove = function(evt) {
         var mouseOverElement, scope;
@@ -147,18 +154,22 @@
         $scope.mouseOverNode = (scope && scope.node ? scope.node : null);
       };
       $scope.nodeMouseDown = function(evt, node) {
-        var chart, lastMouseCoords;
+        var chart, classname, lastMouseCoords;
+        if (evt.shiftKey || evt.ctrlKey) {
+          $scope.chart.handleNodeClicked(node, true);
+        } else {
+          if (!node.selected()) {
+            $scope.chart.deselectAll();
+            node.select();
+          }
+        }
         switch (evt.button) {
           case 0:
             chart = $scope.chart;
             lastMouseCoords = void 0;
             dragging.startDrag(evt, {
               dragStarted: function(x, y) {
-                lastMouseCoords = controller.translateCoordinates(x, y);
-                if (!node.selected()) {
-                  chart.deselectAll();
-                  node.select();
-                }
+                return lastMouseCoords = controller.translateCoordinates(x, y);
               },
               dragging: function(x, y) {
                 var curCoords, deltaX, deltaY;
@@ -168,23 +179,58 @@
                 chart.updateSelectedNodesLocation(deltaX, deltaY);
                 lastMouseCoords = curCoords;
               },
-              clicked: function() {
-                chart.handleNodeClicked(node, evt.ctrlKey);
-              }
+              clicked: function() {}
             });
             break;
           case 2:
-            return console.log(evt);
+            if (node.selected()) {
+              classname = evt.target.attributes["class"].nodeValue;
+              if (classname === 'selected-node-rect' || 'mouseover-node-rect') {
+                console.log('rihgt click on node');
+                return console.log(node.data);
+              }
+            }
         }
       };
       $scope.connectionMouseDown = function(evt, connection) {
-        var chart;
-        chart = $scope.chart;
-        chart.handleConnectionMouseDown(connection, evt.ctrlKey);
         evt.stopPropagation();
         evt.preventDefault();
+        if (evt.shiftKey || evt.ctrlKey) {
+          $scope.chart.handleConnectionMouseDown(connection, true);
+        } else {
+          if (!connection.selected()) {
+            $scope.chart.deselectAll();
+            connection.select();
+          }
+        }
+        switch (evt.button) {
+          case 0:
+            return console.log('left click on connection');
+          case 2:
+            console.log('rihgt click on connection');
+            return console.log(connection.data);
+        }
+      };
+      $scope.connectedConnectorMouseDown = function(evt, connection) {
+        var dd, sd;
+        sd = Math.abs(event.x - connection.sourceCoordX()) + Math.abs(event.y - connection.sourceCoordY());
+        dd = Math.abs(event.x - connection.destCoordX()) + Math.abs(event.y - connection.destCoordY());
+        if (sd < 35) {
+          console.log('nears source');
+          console.log(connection.source.name());
+          console.log(connection.source.x());
+          console.log(connection.source.y());
+        }
+        if (dd < 35) {
+          return console.log('near des');
+        }
       };
       return $scope.connectorMouseDown = function(evt, node, connector, connectorIndex, isInputConnector) {
+        console.log(evt);
+        console.log(node);
+        console.log(connector);
+        console.log(connectorIndex);
+        console.log(isInputConnector);
         dragging.startDrag(evt, {
           dragStarted: function(x, y) {
             var curCoords;

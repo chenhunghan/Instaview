@@ -86,37 +86,42 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       point.matrixTransform matrix.inverse()
     # Called on mouse down in the chart.
     $scope.mouseDown = (evt) ->
-      $scope.chart.deselectAll()
-      dragging.startDrag evt,
-        # Commence dragging... setup variables to display the drag selection rect.
-        dragStarted: (x, y) ->
-          $scope.dragSelecting = true
-          startPoint = controller.translateCoordinates(x, y)
-          $scope.dragSelectionStartPoint = startPoint
-          $scope.dragSelectionRect =
-            x: startPoint.x
-            y: startPoint.y
-            width: 0
-            height: 0
-          return
-      # Update the drag selection rect while dragging continues.
-        dragging: (x, y) ->
-          startPoint = $scope.dragSelectionStartPoint
-          curPoint = controller.translateCoordinates(x, y)
-          $scope.dragSelectionRect =
-            x: (if curPoint.x > startPoint.x then startPoint.x else curPoint.x)
-            y: (if curPoint.y > startPoint.y then startPoint.y else curPoint.y)
-            width: (if curPoint.x > startPoint.x then curPoint.x - startPoint.x else startPoint.x - curPoint.x)
-            height: (if curPoint.y > startPoint.y then curPoint.y - startPoint.y else startPoint.y - curPoint.y)
-          return
-      # Dragging has ended... select all that are within the drag selection rect.
-        dragEnded: ->
-          $scope.dragSelecting = false
-          $scope.chart.applySelectionRect $scope.dragSelectionRect
-          delete $scope.dragSelectionStartPoint
-          delete $scope.dragSelectionRect
-          return
-      return
+      switch evt.button
+        when 0
+          $scope.chart.deselectAll()
+          dragging.startDrag evt,
+            # Commence dragging... setup variables to display the drag selection rect.
+            dragStarted: (x, y) ->
+              $scope.dragSelecting = true
+              startPoint = controller.translateCoordinates(x, y)
+              $scope.dragSelectionStartPoint = startPoint
+              $scope.dragSelectionRect =
+                x: startPoint.x
+                y: startPoint.y
+                width: 0
+                height: 0
+              return
+          # Update the drag selection rect while dragging continues.
+            dragging: (x, y) ->
+              startPoint = $scope.dragSelectionStartPoint
+              curPoint = controller.translateCoordinates(x, y)
+              $scope.dragSelectionRect =
+                x: (if curPoint.x > startPoint.x then startPoint.x else curPoint.x)
+                y: (if curPoint.y > startPoint.y then startPoint.y else curPoint.y)
+                width: (if curPoint.x > startPoint.x then curPoint.x - startPoint.x else startPoint.x - curPoint.x)
+                height: (if curPoint.y > startPoint.y then curPoint.y - startPoint.y else startPoint.y - curPoint.y)
+              return
+          # Dragging has ended... select all that are within the drag selection rect.
+            dragEnded: ->
+              $scope.dragSelecting = false
+              $scope.chart.applySelectionRect $scope.dragSelectionRect
+              delete $scope.dragSelectionStartPoint
+              delete $scope.dragSelectionRect
+              return
+        when 2
+          if evt.target.attributes.class.nodeValue and evt.target.attributes.class.nodeValue is 'draggable-container'
+            console.log 'right click on flowchart.'
+
     # Called for each mouse move on the svg element.
     $scope.mouseMove = (evt) ->
       # Clear out all cached mouse over elements.
@@ -143,6 +148,14 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       return
     # Handle mousedown on a node.
     $scope.nodeMouseDown = (evt, node) ->
+      if evt.shiftKey or evt.ctrlKey
+        $scope.chart.handleNodeClicked node, true
+      else
+        # If nothing is selected when dragging starts,
+        # at least select the node we are dragging.
+        unless node.selected()
+          $scope.chart.deselectAll()
+          node.select()
       switch evt.button
         when 0
           chart = $scope.chart
@@ -151,12 +164,6 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
             # Node dragging has commenced.
             dragStarted: (x, y) ->
               lastMouseCoords = controller.translateCoordinates(x, y)
-              # If nothing is selected when dragging starts,
-              # at least select the node we are dragging.
-              unless node.selected()
-                chart.deselectAll()
-                node.select()
-              return
           # Dragging selected nodes... update their x,y coordinates.
             dragging: (x, y) ->
               curCoords = controller.translateCoordinates(x, y)
@@ -167,22 +174,51 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
               return
           # The node wasn't dragged... it was clicked.
             clicked: ->
-              chart.handleNodeClicked node, evt.ctrlKey
-              return
+                return
           return
         when 2
-          console.log evt
-
+          #console.log evt
+          if node.selected()
+            classname = evt.target.attributes.class.nodeValue
+            if classname is 'selected-node-rect' or 'mouseover-node-rect'
+              console.log 'rihgt click on node'
+              console.log node.data
     # Handle mousedown on a connection.
     $scope.connectionMouseDown = (evt, connection) ->
-      chart = $scope.chart
-      chart.handleConnectionMouseDown connection, evt.ctrlKey
-      # Don't let the chart handle the mouse down.
+      #need to prevent default action on path
       evt.stopPropagation()
       evt.preventDefault()
-      return
+      if evt.shiftKey or evt.ctrlKey
+        $scope.chart.handleConnectionMouseDown connection, true
+      else
+        unless connection.selected()
+          $scope.chart.deselectAll()
+          connection.select()
+      switch evt.button
+        when 0
+          console.log 'left click on connection'
+        when 2
+          console.log 'rihgt click on connection'
+          console.log connection.data
+    $scope.connectedConnectorMouseDown = (evt, connection) ->
+      sd = Math.abs(event.x - connection.sourceCoordX()) + Math.abs(event.y - connection.sourceCoordY())
+      dd = Math.abs(event.x - connection.destCoordX()) + Math.abs(event.y - connection.destCoordY())
+      if sd < 35
+        console.log 'nears source'
+        #console.log connection.source #flowchart.ConnectorViewModel
+        console.log connection.source.name()
+        console.log connection.source.x()
+        console.log connection.source.y()
+      if dd < 35
+        console.log 'near des'
+        #console.log connection.dest #flowchart.ConnectorViewModel
     # Handle mousedown on an input connector.
     $scope.connectorMouseDown = (evt, node, connector, connectorIndex, isInputConnector) ->
+      console.log evt #evt
+      console.log node #flowchart.NodeViewModel
+      console.log connector #flowchart.ConnectorViewModel
+      console.log connectorIndex #0
+      console.log isInputConnector #true or false
       # Initiate dragging out of a connection.
       dragging.startDrag evt,
         # Called when the mouse has moved greater than the threshold distance
