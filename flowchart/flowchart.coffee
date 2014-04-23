@@ -201,24 +201,40 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
           console.log 'rihgt click on connection'
           console.log connection.data
     $scope.connectedConnectorMouseDown = (evt, connection) ->
+      unless connection.selected()
+        $scope.chart.deselectAll()
+        connection.select()
       sd = Math.abs(event.x - connection.sourceCoordX()) + Math.abs(event.y - connection.sourceCoordY())
       dd = Math.abs(event.x - connection.destCoordX()) + Math.abs(event.y - connection.destCoordY())
+      isInputConnector = (connector) ->
+        if connector.x() is 250
+          return false
+        else
+          return true
+      node = (connector) ->
+        return connector.parentNode()
+      connectorIndex = (connector) ->
+        switch isInputConnector(connector)
+          when true
+            for n,i in node(connector).inputConnectors
+              if angular.equals(n, connector)
+                return i
+          when false
+            for n,i in node(connector).outputConnectors
+              if angular.equals(n, connector)
+                return i
       if sd < 35
-        console.log 'nears source'
-        #console.log connection.source #flowchart.ConnectorViewModel
-        console.log connection.source.name()
-        console.log connection.source.x()
-        console.log connection.source.y()
+        connector = connection.dest
+        $scope.connectorMouseDown(evt, node(connector), connector, connectorIndex(connector), isInputConnector(connector))
+        $scope.chart.deleteSelected()
+
+
       if dd < 35
-        console.log 'near des'
-        #console.log connection.dest #flowchart.ConnectorViewModel
+        connector = connection.source
+        $scope.connectorMouseDown(evt, node(connector), connector, connectorIndex(connector), isInputConnector(connector))
+        $scope.chart.deleteSelected()
     # Handle mousedown on an input connector.
     $scope.connectorMouseDown = (evt, node, connector, connectorIndex, isInputConnector) ->
-      console.log evt #evt
-      console.log node #flowchart.NodeViewModel
-      console.log connector #flowchart.ConnectorViewModel
-      console.log connectorIndex #0
-      console.log isInputConnector #true or false
       # Initiate dragging out of a connection.
       dragging.startDrag evt,
         # Called when the mouse has moved greater than the threshold distance

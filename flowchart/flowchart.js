@@ -212,25 +212,57 @@
         }
       };
       $scope.connectedConnectorMouseDown = function(evt, connection) {
-        var dd, sd;
+        var connector, connectorIndex, dd, isInputConnector, node, sd;
+        if (!connection.selected()) {
+          $scope.chart.deselectAll();
+          connection.select();
+        }
         sd = Math.abs(event.x - connection.sourceCoordX()) + Math.abs(event.y - connection.sourceCoordY());
         dd = Math.abs(event.x - connection.destCoordX()) + Math.abs(event.y - connection.destCoordY());
+        isInputConnector = function(connector) {
+          if (connector.x() === 250) {
+            return false;
+          } else {
+            return true;
+          }
+        };
+        node = function(connector) {
+          return connector.parentNode();
+        };
+        connectorIndex = function(connector) {
+          var i, n, _i, _j, _len, _len1, _ref, _ref1;
+          switch (isInputConnector(connector)) {
+            case true:
+              _ref = node(connector).inputConnectors;
+              for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+                n = _ref[i];
+                if (angular.equals(n, connector)) {
+                  return i;
+                }
+              }
+              break;
+            case false:
+              _ref1 = node(connector).outputConnectors;
+              for (i = _j = 0, _len1 = _ref1.length; _j < _len1; i = ++_j) {
+                n = _ref1[i];
+                if (angular.equals(n, connector)) {
+                  return i;
+                }
+              }
+          }
+        };
         if (sd < 35) {
-          console.log('nears source');
-          console.log(connection.source.name());
-          console.log(connection.source.x());
-          console.log(connection.source.y());
+          connector = connection.dest;
+          $scope.connectorMouseDown(evt, node(connector), connector, connectorIndex(connector), isInputConnector(connector));
+          $scope.chart.deleteSelected();
         }
         if (dd < 35) {
-          return console.log('near des');
+          connector = connection.source;
+          $scope.connectorMouseDown(evt, node(connector), connector, connectorIndex(connector), isInputConnector(connector));
+          return $scope.chart.deleteSelected();
         }
       };
       return $scope.connectorMouseDown = function(evt, node, connector, connectorIndex, isInputConnector) {
-        console.log(evt);
-        console.log(node);
-        console.log(connector);
-        console.log(connectorIndex);
-        console.log(isInputConnector);
         dragging.startDrag(evt, {
           dragStarted: function(x, y) {
             var curCoords;
