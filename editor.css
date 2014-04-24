@@ -3,16 +3,16 @@ Generic reset.
 */
 
 * {
-	padding: 0;
-	margin: 0;
+    padding: 0;
+    margin: 0;
 }
 
 .test {
-	border: 5px red solid;
-	padding: 10;
-	margin: 10;
-	font-family: "Times New Roman";
-	font-style: italic;
+    border: 5px red solid;
+    padding: 10;
+    margin: 10;
+    font-family: "Times New Roman";
+    font-style: italic;
 }
 
 /*
@@ -20,27 +20,21 @@ Styles for nodes and connectors.
 */
 
 .node-rect {
-	stroke: black;
-	stroke-width: 2;
+    stroke: black;
+    stroke-width: 2;
     z-index: 1;
 }
 
 .mouseover-node-rect {
-	stroke: black;
-	stroke-width: 4;
+    stroke: black;
+    stroke-width: 4;
 }
 
 .selected-node-rect {
-	stroke: red;
-	stroke-width: 3;
+    stroke: red;
+    stroke-width: 3;
 }
 
-.connector-circle {
-    fill: white;
-    stroke: black;
-    stroke-width: 2;
-    z-index:2;
-}
 
 .mouseover-connector-circle {
     fill: white;
@@ -56,34 +50,34 @@ Style for connections.
 }
 
 .connection-line {
-	stroke: gray;
-	stroke-width: 4;
-	fill: transparent;
+    stroke: gray;
+    stroke-width: 4;
+    fill: transparent;
     z-index:3;
 }
 
 .mouseover-connection-line {
-	stroke: gray;
-	stroke-width: 6;
-	fill: transparent;
+    stroke: gray;
+    stroke-width: 6;
+    fill: transparent;
 }
 
 .selected-connection-line {
-	stroke: red;
-	stroke-width: 4;
-	fill: transparent;
+    stroke: red;
+    stroke-width: 4;
+    fill: transparent;
 }
 
 .connection-endpoint {
-	fill: gray;
+    fill: gray;
 }
 
 .selected-connection-endpoint {
-	fill: red;
+    fill: red;
 }
 
 .mouseover-connection-endpoint {
-	fill: gray;
+    fill: gray;
 }
 
 /*
@@ -91,17 +85,17 @@ Style for the connection being dragged out.
 */
 
 .dragging-connection {
-	pointer-events: none;
+    pointer-events: none;
 }
 
 .dragging-connection-line {
-	stroke: gray;
-	stroke-width: 3;
-	fill: transparent;
+    stroke: gray;
+    stroke-width: 3;
+    fill: transparent;
 }
 
 .dragging-connection-endpoint {
-	fill: gray;
+    fill: gray;
 }
 
 /*
@@ -109,7 +103,7 @@ The element (in this case the SVG element) that contains the draggable elements.
 */
 
 .draggable-container {
-	border: solid 1px blue;
+    border: solid 1px blue;
 }
 
 /*
@@ -117,8 +111,8 @@ Drag selection rectangle.
 */
 
 .drag-selection-rect {
-	stroke: blue;
-	stroke-width: 2;
-	fill: transparent;
+    stroke: blue;
+    stroke-width: 2;
+    fill: transparent;
 }
 

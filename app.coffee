@@ -12,11 +12,11 @@ ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap'])
 ngapp.service "flowchartDataModel", [ ()->
   flowchart = this
   # Width of a node.
-  flowchart.nodeWidth = 250
+  flowchart.nodeWidth = 125
   # Amount of space reserved for displaying the node's name.
-  flowchart.nodeNameHeight = 40
+  flowchart.nodeNameHeight = 70
   # Height of a connector in a node.
-  flowchart.connectorHeight = 35
+  flowchart.connectorHeight = 56
   # Compute the Y coordinate of a connector, given its index.
   flowchart.computeConnectorY = (connectorIndex) ->
     flowchart.nodeNameHeight + (connectorIndex * flowchart.connectorHeight)
@@ -55,6 +55,7 @@ ngapp.service "flowchartDataModel", [ ()->
     viewModels
   # View model for a node.
   flowchart.NodeViewModel = (nodeDataModel) ->
+    #padding = 18 #padding space for each connector
     @data = nodeDataModel
     @inputConnectors = createConnectorsViewModel(@data.inputConnectors, 0, this)
     @outputConnectors = createConnectorsViewModel(@data.outputConnectors, flowchart.nodeWidth, this)
@@ -459,58 +460,70 @@ ngapp.controller "AppCtrl", [
     chartDataModel =
       nodes: [
         {
-          name: "Example Node 1"
+          name: "IS-084"
           id: 0
           x: 0
           y: 0
           inputConnectors: [
             {
-              name: "A"
+              name: "P1"
             }
             {
-              name: "B"
+              name: "P2"
             }
             {
-              name: "C"
+              name: "P3"
+            }
+            {
+              name: "P4"
             }
           ]
           outputConnectors: [
             {
-              name: "A"
+              name: "P5"
             }
             {
-              name: "B"
+              name: "P6"
             }
             {
-              name: "C"
+              name: "P7"
+            }
+            {
+              name: "P8"
             }
           ]
         }
         {
-          name: "Example Node 2"
+          name: "IS-085"
           id: 1
           x: 400
           y: 200
           inputConnectors: [
             {
-              name: "A"
+              name: "P1"
             }
             {
-              name: "B"
+              name: "P2"
             }
             {
-              name: "C"
+              name: "P3"
+            }
+            {
+              name: "P4"
             }
           ]
           outputConnectors: [
             {
-              name: "A"
+              name: "P5"
             }
             {
-              name: "B"
+              name: "P6"
             }
             {
-              name: "C"
+              name: "P7"
+            }
+            {
+              name: "P8"
             }
           ]
         }
@@ -652,3 +665,8 @@ ngapp.directive "ngRightClick", ($parse) ->
         event.preventDefault()
         fn scope,
           $event: event
+
+ngapp.directive "machine", ->
+  restrict: "E"
+  templateUrl: "flowchart/machine.html"
+  replace: true

@@ -23,9 +23,9 @@
     function() {
       var computeConnectionTangentOffset, createConnectorsViewModel, createNodesViewModel, flowchart;
       flowchart = this;
-      flowchart.nodeWidth = 250;
-      flowchart.nodeNameHeight = 40;
-      flowchart.connectorHeight = 35;
+      flowchart.nodeWidth = 125;
+      flowchart.nodeNameHeight = 70;
+      flowchart.connectorHeight = 56;
       flowchart.computeConnectorY = function(connectorIndex) {
         return flowchart.nodeNameHeight + (connectorIndex * flowchart.connectorHeight);
       };
@@ -509,49 +509,57 @@
       chartDataModel = {
         nodes: [
           {
-            name: "Example Node 1",
+            name: "IS-084",
             id: 0,
             x: 0,
             y: 0,
             inputConnectors: [
               {
-                name: "A"
+                name: "P1"
               }, {
-                name: "B"
+                name: "P2"
               }, {
-                name: "C"
+                name: "P3"
+              }, {
+                name: "P4"
               }
             ],
             outputConnectors: [
               {
-                name: "A"
+                name: "P5"
               }, {
-                name: "B"
+                name: "P6"
               }, {
-                name: "C"
+                name: "P7"
+              }, {
+                name: "P8"
               }
             ]
           }, {
-            name: "Example Node 2",
+            name: "IS-085",
             id: 1,
             x: 400,
             y: 200,
             inputConnectors: [
               {
-                name: "A"
+                name: "P1"
               }, {
-                name: "B"
+                name: "P2"
               }, {
-                name: "C"
+                name: "P3"
+              }, {
+                name: "P4"
               }
             ],
             outputConnectors: [
               {
-                name: "A"
+                name: "P5"
               }, {
-                name: "B"
+                name: "P6"
               }, {
-                name: "C"
+                name: "P7"
+              }, {
+                name: "P8"
               }
             ]
           }
@@ -719,6 +727,14 @@
           });
         });
       });
+    };
+  });
+
+  ngapp.directive("machine", function() {
+    return {
+      restrict: "E",
+      templateUrl: "flowchart/machine.html",
+      replace: true
     };
   });
 

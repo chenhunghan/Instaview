@@ -35,7 +35,7 @@
   angular.module("flowChart", ["dragging"]).directive("flowChart", function() {
     return {
       restrict: "E",
-      templateUrl: "flowchart/flowchart_template.html",
+      templateUrl: "flowchart/machine.html",
       replace: true,
       scope: {
         chart: "=chart"
@@ -124,7 +124,7 @@
               }
             });
           case 2:
-            if (evt.target.attributes["class"].nodeValue && evt.target.attributes["class"].nodeValue === 'draggable-container') {
+            if (evt.target.nodeName && evt.target.nodeName === 'svg') {
               return console.log('right click on flowchart.');
             }
         }
@@ -154,7 +154,7 @@
         $scope.mouseOverNode = (scope && scope.node ? scope.node : null);
       };
       $scope.nodeMouseDown = function(evt, node) {
-        var chart, classname, lastMouseCoords;
+        var chart, lastMouseCoords;
         if (evt.shiftKey || evt.ctrlKey) {
           $scope.chart.handleNodeClicked(node, true);
         } else {
@@ -184,11 +184,8 @@
             break;
           case 2:
             if (node.selected()) {
-              classname = evt.target.attributes["class"].nodeValue;
-              if (classname === 'selected-node-rect' || 'mouseover-node-rect') {
-                console.log('rihgt click on node');
-                return console.log(node.data);
-              }
+              console.log('rihgt click on node');
+              return console.log(node.data);
             }
         }
       };
@@ -220,7 +217,7 @@
         sd = Math.abs(event.x - connection.sourceCoordX()) + Math.abs(event.y - connection.sourceCoordY());
         dd = Math.abs(event.x - connection.destCoordX()) + Math.abs(event.y - connection.destCoordY());
         isInputConnector = function(connector) {
-          if (connector.x() === 250) {
+          if (connector.x() === flowchartDataModel.nodeWidth) {
             return false;
           } else {
             return true;

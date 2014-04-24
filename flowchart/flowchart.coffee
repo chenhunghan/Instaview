@@ -21,7 +21,7 @@ hasClassSVG = (obj, has) ->
     true
 angular.module("flowChart", ["dragging"]).directive("flowChart", ->
   restrict: "E"
-  templateUrl: "flowchart/flowchart_template.html"
+  templateUrl: "flowchart/machine.html"
   replace: true
   scope:
     chart: "=chart"
@@ -119,7 +119,7 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
               delete $scope.dragSelectionRect
               return
         when 2
-          if evt.target.attributes.class.nodeValue and evt.target.attributes.class.nodeValue is 'draggable-container'
+          if evt.target.nodeName and evt.target.nodeName is 'svg'
             console.log 'right click on flowchart.'
 
     # Called for each mouse move on the svg element.
@@ -179,10 +179,8 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
         when 2
           #console.log evt
           if node.selected()
-            classname = evt.target.attributes.class.nodeValue
-            if classname is 'selected-node-rect' or 'mouseover-node-rect'
-              console.log 'rihgt click on node'
-              console.log node.data
+            console.log 'rihgt click on node'
+            console.log node.data
     # Handle mousedown on a connection.
     $scope.connectionMouseDown = (evt, connection) ->
       #need to prevent default action on path
@@ -207,7 +205,7 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       sd = Math.abs(event.x - connection.sourceCoordX()) + Math.abs(event.y - connection.sourceCoordY())
       dd = Math.abs(event.x - connection.destCoordX()) + Math.abs(event.y - connection.destCoordY())
       isInputConnector = (connector) ->
-        if connector.x() is 250
+        if connector.x() is flowchartDataModel.nodeWidth
           return false
         else
           return true
@@ -227,8 +225,6 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
         connector = connection.dest
         $scope.connectorMouseDown(evt, node(connector), connector, connectorIndex(connector), isInputConnector(connector))
         $scope.chart.deleteSelected()
-
-
       if dd < 35
         connector = connection.source
         $scope.connectorMouseDown(evt, node(connector), connector, connectorIndex(connector), isInputConnector(connector))

@@ -1,4 +1,4 @@
-<svg 
+<svg
   class="draggable-container"
   xmlns="http://www.w3.org/2000/svg"
   ng-mousedown="mouseDown($event)"
@@ -30,28 +30,18 @@
     ng-mousedown="nodeMouseDown($event, node)"
     ng-attr-transform="translate({{node.x()}}, {{node.y()}})"
     >
-    <rect 
+    <rect
       ng-attr-class="{{node.selected() && 'selected-node-rect' || (node == mouseOverNode && 'mouseover-node-rect' || 'node-rect')}}"
-      ry="10" 
-      rx="10" 
-      x="0" 
-      y="0" 
-      ng-attr-width="{{node.width()}}" 
-      ng-attr-height="{{node.height()}}" 
+      ry="10"
+      rx="10"
+      x="0"
+      y="0"
+      ng-attr-width="{{node.width()}}"
+      ng-attr-height="{{node.height()}}"
       fill="url(#nodeBackgroundGradient)"
       >
 
     </rect>
-
-    <text
-      ng-attr-x="{{node.width()/2}}"
-      y="25"
-      text-anchor="middle"
-      alignment-baseline="middle"
-      >
-      {{node.name()}}
-    </text>
-
     <g
       ng-repeat="connector in node.inputConnectors"
       ng-mousedown="connectorMouseDown($event, node, connector, $index, true)"
@@ -65,9 +55,9 @@
         >
         {{connector.name()}}
       </text>
-      <circle       
+      <circle
         ng-attr-class="{{connector == mouseOverConnector && 'mouseover-connector-circle' || 'connector-circle'}}"
-        ng-attr-r="{{connectorSize}}" 
+        ng-attr-r="{{connectorSize}}"
         ng-attr-cx="{{connector.x()}}"
         ng-attr-cy="{{connector.y()}}"
         />
@@ -86,9 +76,9 @@
         >
         {{connector.name()}}
       </text>
-      <circle             
+      <circle
         ng-attr-class="{{connector == mouseOverConnector && 'mouseover-connector-circle' || 'connector-circle'}}"
-        ng-attr-r="{{connectorSize}}" 
+        ng-attr-r="{{connectorSize}}"
         ng-attr-cx="{{connector.x()}}"
         ng-attr-cy="{{connector.y()}}"
         />
@@ -113,16 +103,16 @@
             ng-mousedown="connectedConnectorMouseDown($event, connection)"
             ng-attr-class="{{connection.selected() && 'selected-connection-endpoint' || (connection == mouseOverConnection && 'mouseover-connection-endpoint' || 'connection-endpoint')}}"
             ng-attr-r="{{connectorSize*0.6}}"
-            ng-attr-cx="{{connection.sourceCoordX()}}" 
-            ng-attr-cy="{{connection.sourceCoordY()}}" 
+            ng-attr-cx="{{connection.sourceCoordX()}}"
+            ng-attr-cy="{{connection.sourceCoordY()}}"
             >
         </circle>
         <circle
             ng-mousedown="connectedConnectorMouseDown($event, connection)"
             ng-attr-class="{{connection.selected() && 'selected-connection-endpoint' || (connection == mouseOverConnection && 'mouseover-connection-endpoint' || 'connection-endpoint')}}"
             ng-attr-r="{{connectorSize*0.6}}"
-            ng-attr-cx="{{connection.destCoordX()}}" 
-            ng-attr-cy="{{connection.destCoordY()}}" 
+            ng-attr-cx="{{connection.destCoordX()}}"
+            ng-attr-cy="{{connection.destCoordY()}}"
             >
         </circle>
     </g>
