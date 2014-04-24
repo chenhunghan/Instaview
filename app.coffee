@@ -13,6 +13,7 @@ ngapp.service "flowchartDataModel", [ ()->
   flowchart = this
   # Width of a node.
   flowchart.nodeWidth = 125
+  padding = 15
   # Amount of space reserved for displaying the node's name.
   flowchart.nodeNameHeight = 70
   # Height of a connector in a node.
@@ -22,10 +23,14 @@ ngapp.service "flowchartDataModel", [ ()->
     flowchart.nodeNameHeight + (connectorIndex * flowchart.connectorHeight)
   # Compute the position of a connector in the graph.
   flowchart.computeConnectorPos = (node, connectorIndex, inputConnector) ->
-    x: node.x() + ((if inputConnector then 0 else flowchart.nodeWidth))
+    x: node.x() + (if inputConnector then padding else (flowchart.nodeWidth - padding))
     y: node.y() + flowchart.computeConnectorY(connectorIndex)
   # View model for a connector.
   flowchart.ConnectorViewModel = (connectorDataModel, x, y, parentNode) ->
+    if x is 0
+      x = x + padding
+    else
+      x = x - padding
     @data = connectorDataModel
     @_parentNode = parentNode
     @_x = x
@@ -36,6 +41,7 @@ ngapp.service "flowchartDataModel", [ ()->
     # X coordinate of the connector.
     @x = ->
       @_x
+
     # Y coordinate of the connector.
     @y = ->
       @_y

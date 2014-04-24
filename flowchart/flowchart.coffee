@@ -40,7 +40,7 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       $ element
     # Init data-model variables.
     $scope.draggingConnection = false
-    $scope.connectorSize = 10
+    $scope.connectorSize = 11
     $scope.dragSelecting = false
     # Can use this to test the drag selection rect.
     #	$scope.dragSelectionRect = {
@@ -231,6 +231,14 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
         $scope.chart.deleteSelected()
     # Handle mousedown on an input connector.
     $scope.connectorMouseDown = (evt, node, connector, connectorIndex, isInputConnector) ->
+      ###
+      console.log evt
+      console.log node
+      console.log connector
+      console.log connectorIndex
+      console.log isInputConnector
+
+###
       # Initiate dragging out of a connection.
       dragging.startDrag evt,
         # Called when the mouse has moved greater than the threshold distance

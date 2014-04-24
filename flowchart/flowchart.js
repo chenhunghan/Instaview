@@ -51,7 +51,7 @@
         return $(element);
       };
       $scope.draggingConnection = false;
-      $scope.connectorSize = 10;
+      $scope.connectorSize = 11;
       $scope.dragSelecting = false;
       $scope.mouseOverConnector = null;
       $scope.mouseOverConnection = null;
@@ -260,6 +260,14 @@
         }
       };
       return $scope.connectorMouseDown = function(evt, node, connector, connectorIndex, isInputConnector) {
+        /*
+        console.log evt
+        console.log node
+        console.log connector
+        console.log connectorIndex
+        console.log isInputConnector
+        */
+
         dragging.startDrag(evt, {
           dragStarted: function(x, y) {
             var curCoords;
