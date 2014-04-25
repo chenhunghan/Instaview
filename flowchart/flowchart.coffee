@@ -40,7 +40,7 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       $ element
     # Init data-model variables.
     $scope.draggingConnection = false
-    $scope.connectorSize = 11
+    $scope.connectorSize = 10
     $scope.dragSelecting = false
     # Can use this to test the drag selection rect.
     #	$scope.dragSelectionRect = {
@@ -205,7 +205,7 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       sd = Math.abs(event.x - connection.sourceCoordX()) + Math.abs(event.y - connection.sourceCoordY())
       dd = Math.abs(event.x - connection.destCoordX()) + Math.abs(event.y - connection.destCoordY())
       isInputConnector = (connector) ->
-        if connector.x() is flowchartDataModel.nodeWidth
+        if connector.x() is (flowchartDataModel.nodeWidth - flowchartDataModel.padding)
           return false
         else
           return true

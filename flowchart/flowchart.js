@@ -51,7 +51,7 @@
         return $(element);
       };
       $scope.draggingConnection = false;
-      $scope.connectorSize = 11;
+      $scope.connectorSize = 10;
       $scope.dragSelecting = false;
       $scope.mouseOverConnector = null;
       $scope.mouseOverConnection = null;
@@ -217,7 +217,7 @@
         sd = Math.abs(event.x - connection.sourceCoordX()) + Math.abs(event.y - connection.sourceCoordY());
         dd = Math.abs(event.x - connection.destCoordX()) + Math.abs(event.y - connection.destCoordY());
         isInputConnector = function(connector) {
-          if (connector.x() === flowchartDataModel.nodeWidth) {
+          if (connector.x() === (flowchartDataModel.nodeWidth - flowchartDataModel.padding)) {
             return false;
           } else {
             return true;

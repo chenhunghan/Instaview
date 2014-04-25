@@ -21,10 +21,10 @@
 
   ngapp.service("flowchartDataModel", [
     function() {
-      var computeConnectionTangentOffset, createConnectorsViewModel, createNodesViewModel, flowchart, padding;
+      var computeConnectionTangentOffset, createConnectorsViewModel, createNodesViewModel, flowchart;
       flowchart = this;
       flowchart.nodeWidth = 125;
-      padding = 15;
+      flowchart.padding = 22;
       flowchart.nodeNameHeight = 70;
       flowchart.connectorHeight = 56;
       flowchart.computeConnectorY = function(connectorIndex) {
@@ -32,15 +32,15 @@
       };
       flowchart.computeConnectorPos = function(node, connectorIndex, inputConnector) {
         return {
-          x: node.x() + (inputConnector ? padding : flowchart.nodeWidth - padding),
+          x: node.x() + (inputConnector ? flowchart.padding : flowchart.nodeWidth - flowchart.padding),
           y: node.y() + flowchart.computeConnectorY(connectorIndex)
         };
       };
       flowchart.ConnectorViewModel = function(connectorDataModel, x, y, parentNode) {
         if (x === 0) {
-          x = x + padding;
+          x = x + flowchart.padding;
         } else {
-          x = x - padding;
+          x = x - flowchart.padding;
         }
         this.data = connectorDataModel;
         this._parentNode = parentNode;
