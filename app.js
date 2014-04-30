@@ -17,7 +17,7 @@
     }
   };
 
-  ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap']);
+  ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']);
 
   ngapp.service("flowchartDataModel", [
     function() {
@@ -143,10 +143,14 @@
         this.dest = destConnector;
         this._selected = false;
         this.sourceCoordX = function() {
-          return this.source.parentNode().x() + this.source.x();
+          if (this.source) {
+            return this.source.parentNode().x() + this.source.x();
+          }
         };
         this.sourceCoordY = function() {
-          return this.source.parentNode().y() + this.source.y();
+          if (this.source) {
+            return this.source.parentNode().y() + this.source.y();
+          }
         };
         this.sourceCoord = function() {
           return {
@@ -161,10 +165,14 @@
           return flowchart.computeConnectionSourceTangentY(this.sourceCoord(), this.destCoord());
         };
         this.destCoordX = function() {
-          return this.dest.parentNode().x() + this.dest.x();
+          if (this.dest) {
+            return this.dest.parentNode().x() + this.dest.x();
+          }
         };
         this.destCoordY = function() {
-          return this.dest.parentNode().y() + this.dest.y();
+          if (this.dest) {
+            return this.dest.parentNode().y() + this.dest.y();
+          }
         };
         this.destCoord = function() {
           return {
@@ -232,20 +240,63 @@
           throw new Error("Failed to find node " + nodeID);
         };
         this.findInputConnector = function(nodeID, connectorIndex) {
-          var node;
+          /*
+          node = @findNode(nodeID)
+          
+          for co in node.inputConnectors
+            if node.inputConnectors.indexOf(co) is connectorIndex
+              #console.log co
+              return co
+          if not node.inputConnectors or node.inputConnectors.length <= connectorIndex
+            throw new Error("Node " + nodeID + " has invalid input connectors.")
+          node.inputConnectors[connectorIndex]
+          */
+
+          var co, n, node, _i, _j, _len, _len1, _ref, _ref1;
           node = this.findNode(nodeID);
-          if (!node.inputConnectors || node.inputConnectors.length <= connectorIndex) {
-            throw new Error("Node " + nodeID + " has invalid input connectors.");
+          _ref = node.inputConnectors;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            co = _ref[_i];
+            if (co.data.name === connectorIndex) {
+              n = co;
+            }
           }
-          return node.inputConnectors[connectorIndex];
+          _ref1 = node.outputConnectors;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            co = _ref1[_j];
+            if (co.data.name === connectorIndex) {
+              n = co;
+            }
+          }
+          return n;
         };
         this.findOutputConnector = function(nodeID, connectorIndex) {
-          var node;
+          var co, n, node, _i, _j, _len, _len1, _ref, _ref1;
           node = this.findNode(nodeID);
-          if (!node.outputConnectors || node.outputConnectors.length <= connectorIndex) {
-            throw new Error("Node " + nodeID + " has invalid output connectors.");
+          _ref = node.outputConnectors;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            co = _ref[_i];
+            if (co.data.name === connectorIndex) {
+              n = co;
+            }
           }
-          return node.outputConnectors[connectorIndex];
+          _ref1 = node.inputConnectors;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            co = _ref1[_j];
+            if (co.data.name === connectorIndex) {
+              n = co;
+            }
+          }
+          if (n === void 0) {
+            console.log(connectorIndex);
+          }
+          if (n === void 0) {
+            console.log(node.outputConnectors);
+          }
+          if (n === void 0) {
+            console.log(node.inputConnectors);
+          }
+          return n;
         };
         this._createConnectionViewModel = function(connectionDataModel) {
           var destConnector, sourceConnector;
@@ -499,8 +550,96 @@
   ]);
 
   ngapp.controller("AppCtrl", [
-    "$scope", "prompt", "flowchartDataModel", AppCtrl = function($scope, prompt, flowchartDataModel) {
-      var ADown, InitialNodeX, InitialNodeY, aKeyCode, chartDataModel, ctrlDown, ctrlKeyCode, ctrlKeyCodeMac, deleteKeyCode, deleteKeyCodeMac, escKeyCode, nextNodeID, preventDefaultAction;
+    "$scope", "$http", "prompt", "flowchartDataModel", "topoAlgorithm", AppCtrl = function($scope, $http, prompt, flowchartDataModel, topoAlgorithm) {
+      var ADown, InitialNodeX, InitialNodeY, aKeyCode, ctrlDown, ctrlKeyCode, ctrlKeyCodeMac, deleteKeyCode, deleteKeyCodeMac, escKeyCode, nextNodeID, preventDefaultAction;
+      $http.get('resource/wonju_topd.json').success(function(topd) {
+        var cb, dev, ip, raw;
+        raw = (function() {
+          var _results;
+          _results = [];
+          for (ip in topd) {
+            dev = topd[ip];
+            _results.push(dev);
+          }
+          return _results;
+        })();
+        cb = function(data) {
+          var chartDataModel;
+          chartDataModel = {
+            nodes: [
+              {
+                name: "IS-084",
+                id: 0,
+                x: 0,
+                y: 0,
+                inputConnectors: [
+                  {
+                    name: "P1"
+                  }, {
+                    name: "P2"
+                  }, {
+                    name: "P3"
+                  }, {
+                    name: "P4"
+                  }
+                ],
+                outputConnectors: [
+                  {
+                    name: "P5"
+                  }, {
+                    name: "P6"
+                  }, {
+                    name: "P7"
+                  }, {
+                    name: "P8"
+                  }
+                ]
+              }, {
+                name: "IS-085",
+                id: 1,
+                x: 400,
+                y: 200,
+                inputConnectors: [
+                  {
+                    name: "P1"
+                  }, {
+                    name: "P2"
+                  }, {
+                    name: "P3"
+                  }, {
+                    name: "P4"
+                  }
+                ],
+                outputConnectors: [
+                  {
+                    name: "P5"
+                  }, {
+                    name: "P6"
+                  }, {
+                    name: "P7"
+                  }, {
+                    name: "P8"
+                  }
+                ]
+              }
+            ],
+            connections: [
+              {
+                source: {
+                  nodeID: 0,
+                  connectorIndex: 1
+                },
+                dest: {
+                  nodeID: 1,
+                  connectorIndex: 2
+                }
+              }
+            ]
+          };
+          return $scope.chartViewModel = new flowchartDataModel.ChartViewModel(data);
+        };
+        return topoAlgorithm.preProcess(raw, cb);
+      });
       deleteKeyCode = 46;
       deleteKeyCodeMac = 8;
       ctrlKeyCode = 17;
@@ -512,77 +651,6 @@
       nextNodeID = 0;
       InitialNodeX = 50;
       InitialNodeY = 50;
-      chartDataModel = {
-        nodes: [
-          {
-            name: "IS-084",
-            id: 0,
-            x: 0,
-            y: 0,
-            inputConnectors: [
-              {
-                name: "P1"
-              }, {
-                name: "P2"
-              }, {
-                name: "P3"
-              }, {
-                name: "P4"
-              }
-            ],
-            outputConnectors: [
-              {
-                name: "P5"
-              }, {
-                name: "P6"
-              }, {
-                name: "P7"
-              }, {
-                name: "P8"
-              }
-            ]
-          }, {
-            name: "IS-085",
-            id: 1,
-            x: 400,
-            y: 200,
-            inputConnectors: [
-              {
-                name: "P1"
-              }, {
-                name: "P2"
-              }, {
-                name: "P3"
-              }, {
-                name: "P4"
-              }
-            ],
-            outputConnectors: [
-              {
-                name: "P5"
-              }, {
-                name: "P6"
-              }, {
-                name: "P7"
-              }, {
-                name: "P8"
-              }
-            ]
-          }
-        ],
-        connections: [
-          {
-            source: {
-              nodeID: 0,
-              connectorIndex: 1
-            },
-            dest: {
-              nodeID: 1,
-              connectorIndex: 2
-            }
-          }
-        ]
-      };
       $scope.print = function() {
         return console.log($scope.chartViewModel.data);
       };
@@ -610,7 +678,6 @@
         }
       };
       $scope.keyUp = function(evt) {
-        console.log(evt);
         if ((evt.keyCode === deleteKeyCode) || (evt.keyCode === deleteKeyCodeMac)) {
           $scope.chartViewModel.deleteSelected();
         }
@@ -714,10 +781,9 @@
         };
         return prompt("Enter a connector name:", "", $scope, cb);
       };
-      $scope.deleteSelected = function() {
+      return $scope.deleteSelected = function() {
         $scope.chartViewModel.deleteSelected();
       };
-      return $scope.chartViewModel = new flowchartDataModel.ChartViewModel(chartDataModel);
     }
   ]);
 

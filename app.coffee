@@ -7,7 +7,8 @@ debug = {}
 debug.assertObjectValid = (obj) ->
   throw new Exception("Invalid object!")  unless obj
   throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
-ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap'])
+
+ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo'])
 
 ngapp.service "flowchartDataModel", [ ()->
   flowchart = this
@@ -41,7 +42,6 @@ ngapp.service "flowchartDataModel", [ ()->
     # X coordinate of the connector.
     @x = ->
       @_x
-
     # Y coordinate of the connector.
     @y = ->
       @_y
@@ -133,9 +133,11 @@ ngapp.service "flowchartDataModel", [ ()->
     # Set to true when the connection is selected.
     @_selected = false
     @sourceCoordX = ->
-      @source.parentNode().x() + @source.x()
+      if @source
+        @source.parentNode().x() + @source.x()
     @sourceCoordY = ->
-      @source.parentNode().y() + @source.y()
+      if @source
+        @source.parentNode().y() + @source.y()
     @sourceCoord = ->
       x: @sourceCoordX()
       y: @sourceCoordY()
@@ -144,9 +146,11 @@ ngapp.service "flowchartDataModel", [ ()->
     @sourceTangentY = ->
       flowchart.computeConnectionSourceTangentY @sourceCoord(), @destCoord()
     @destCoordX = ->
-      @dest.parentNode().x() + @dest.x()
+      if @dest
+        @dest.parentNode().x() + @dest.x()
     @destCoordY = ->
-      @dest.parentNode().y() + @dest.y()
+      if @dest
+        @dest.parentNode().y() + @dest.y()
     @destCoord = ->
       x: @destCoordX()
       y: @destCoordY()
@@ -206,14 +210,48 @@ ngapp.service "flowchartDataModel", [ ()->
       return
     # Find a specific input connector within the chart.
     @findInputConnector = (nodeID, connectorIndex) ->
+      ###
       node = @findNode(nodeID)
-      throw new Error("Node " + nodeID + " has invalid input connectors.")  if not node.inputConnectors or node.inputConnectors.length <= connectorIndex
+
+      for co in node.inputConnectors
+        if node.inputConnectors.indexOf(co) is connectorIndex
+          #console.log co
+          return co
+      if not node.inputConnectors or node.inputConnectors.length <= connectorIndex
+        throw new Error("Node " + nodeID + " has invalid input connectors.")
       node.inputConnectors[connectorIndex]
+      ###
+      node = @findNode(nodeID)
+      for co in node.inputConnectors
+        #console.log co
+        if co.data.name is connectorIndex
+          n = co
+      for co in node.outputConnectors
+        #console.log co
+        if co.data.name is connectorIndex
+          n = co
+      n
     # Find a specific output connector within the chart.
     @findOutputConnector = (nodeID, connectorIndex) ->
+      #if not node.outputConnectors or node.outputConnectors.length <= connectorIndex
+      #  throw new Error("Node " + nodeID + " has invalid output connectors.")
       node = @findNode(nodeID)
-      throw new Error("Node " + nodeID + " has invalid output connectors.")  if not node.outputConnectors or node.outputConnectors.length <= connectorIndex
-      node.outputConnectors[connectorIndex]
+      for co in node.outputConnectors
+        #console.log co
+        if co.data.name is connectorIndex
+          n = co
+      for co in node.inputConnectors
+        #console.log co
+        if co.data.name is connectorIndex
+          n = co
+          #return co
+      #n = node.outputConnectors[connectorIndex]
+      #console.log 'node.outputConnectors[connectorIndex]'
+      #console.log n
+      console.log connectorIndex if n is undefined
+      console.log node.outputConnectors if n is undefined
+      console.log node.inputConnectors if n is undefined
+      n
     # Create a view model for connection from the data model.
     @_createConnectionViewModel = (connectionDataModel) ->
       sourceConnector = @findOutputConnector(connectionDataModel.source.nodeID, connectionDataModel.source.connectorIndex)
@@ -224,7 +262,6 @@ ngapp.service "flowchartDataModel", [ ()->
       connectionsViewModel = []
       if connectionsDataModel
         i = 0
-
         while i < connectionsDataModel.length
           connectionsViewModel.push @_createConnectionViewModel(connectionsDataModel[i])
           ++i
@@ -441,10 +478,98 @@ ngapp.service "prompt", ["$modal", ($modal) ->
 ]
 ngapp.controller "AppCtrl", [
   "$scope"
+  "$http"
   "prompt"
   "flowchartDataModel"
-  AppCtrl = ($scope, prompt, flowchartDataModel) ->
-    # Code for the delete key.
+  "topoAlgorithm"
+  AppCtrl = ($scope, $http, prompt, flowchartDataModel, topoAlgorithm) ->
+    $http.get('resource/wonju_topd.json').success (topd) ->
+      raw = (dev for ip,dev of topd)
+      cb = (data) ->
+        chartDataModel =
+          nodes: [
+            {
+              name: "IS-084"
+              id: 0
+              x: 0
+              y: 0
+              inputConnectors: [
+                {
+                  name: "P1"
+                }
+                {
+                  name: "P2"
+                }
+                {
+                  name: "P3"
+                }
+                {
+                  name: "P4"
+                }
+              ]
+              outputConnectors: [
+                {
+                  name: "P5"
+                }
+                {
+                  name: "P6"
+                }
+                {
+                  name: "P7"
+                }
+                {
+                  name: "P8"
+                }
+              ]
+            }
+            {
+              name: "IS-085"
+              id: 1
+              x: 400
+              y: 200
+              inputConnectors: [
+                {
+                  name: "P1"
+                }
+                {
+                  name: "P2"
+                }
+                {
+                  name: "P3"
+                }
+                {
+                  name: "P4"
+                }
+              ]
+              outputConnectors: [
+                {
+                  name: "P5"
+                }
+                {
+                  name: "P6"
+                }
+                {
+                  name: "P7"
+                }
+                {
+                  name: "P8"
+                }
+              ]
+            }
+          ]
+          connections: [
+            source:
+              nodeID: 0
+              connectorIndex: 1
+
+            dest:
+              nodeID: 1
+              connectorIndex: 2
+          ]
+        $scope.chartViewModel = new flowchartDataModel.ChartViewModel(data)
+        #console.log 'this is callback'
+      topoAlgorithm.preProcess(raw, cb)
+  # Code for the delete key.
     deleteKeyCode = 46
     deleteKeyCodeMac = 8
     # Code for control key.
@@ -463,86 +588,6 @@ ngapp.controller "AppCtrl", [
     InitialNodeX = 50
     InitialNodeY = 50
     # Setup the data-model for the chart.
-    chartDataModel =
-      nodes: [
-        {
-          name: "IS-084"
-          id: 0
-          x: 0
-          y: 0
-          inputConnectors: [
-            {
-              name: "P1"
-            }
-            {
-              name: "P2"
-            }
-            {
-              name: "P3"
-            }
-            {
-              name: "P4"
-            }
-          ]
-          outputConnectors: [
-            {
-              name: "P5"
-            }
-            {
-              name: "P6"
-            }
-            {
-              name: "P7"
-            }
-            {
-              name: "P8"
-            }
-          ]
-        }
-        {
-          name: "IS-085"
-          id: 1
-          x: 400
-          y: 200
-          inputConnectors: [
-            {
-              name: "P1"
-            }
-            {
-              name: "P2"
-            }
-            {
-              name: "P3"
-            }
-            {
-              name: "P4"
-            }
-          ]
-          outputConnectors: [
-            {
-              name: "P5"
-            }
-            {
-              name: "P6"
-            }
-            {
-              name: "P7"
-            }
-            {
-              name: "P8"
-            }
-          ]
-        }
-      ]
-      connections: [
-        source:
-          nodeID: 0
-          connectorIndex: 1
-
-        dest:
-          nodeID: 1
-          connectorIndex: 2
-      ]
     $scope.print = () ->
       console.log $scope.chartViewModel.data
     # Event handler for key-down on the flowchart.
@@ -568,7 +613,6 @@ ngapp.controller "AppCtrl", [
         #console.log $scope.chartViewModel
     # Event handler for key-up on the flowchart.
     $scope.keyUp = (evt) ->
-      console.log evt
       # Delete key.
       if (evt.keyCode is deleteKeyCode) or (evt.keyCode is deleteKeyCodeMac)
         $scope.chartViewModel.deleteSelected()
@@ -660,7 +704,7 @@ ngapp.controller "AppCtrl", [
       $scope.chartViewModel.deleteSelected()
       return
     # Create the view-model for the chart and attach to the scope.
-    $scope.chartViewModel = new flowchartDataModel.ChartViewModel(chartDataModel)
+    #$scope.chartViewModel = new flowchartDataModel.ChartViewModel(chartDataModel)
 ]
 
 ngapp.directive "ngRightClick", ($parse) ->

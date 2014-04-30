@@ -15,7 +15,7 @@ angular.module("dragging", ["mouseCapture"]).factory "dragging", ($rootScope, mo
         if Math.abs(evt.pageX - x) > threshold or Math.abs(evt.pageY - y) > threshold
           dragging = true
           config.dragStarted x, y, evt  if config.dragStarted
-          # First 'dragging' call to take into account that we have 
+          # First 'dragging' call to take into account that we have
           # already moved the mouse by a 'threshold' amount.
           config.dragging evt.pageX, evt.pageY, evt  if config.dragging
       else
