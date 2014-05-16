@@ -426,19 +426,14 @@
                     >
             </circle>
             <text
-                    text-anchor="left"
+                    text-anchor="right"
                     alignment-baseline="middle"
                     class="connetor-name"
-                    fill="white"
-                    filter="url(#filter-6)"
-                    sketch:type="MSTextLayer"
-                    font-family="Arial"
-                    font-size="10"
                     >
                 <tspan
                         ng-attr-x="{{connector.x()-connectorSize/2}}"
                         ng-attr-y="{{connector.y()-13}}"
-                        fill="#A2A2A2">
+                        >
                     {{connector.name()}}
                 </tspan>
             </text>
@@ -464,19 +459,14 @@
                     >
             </circle>
             <text
-                    text-anchor="left"
+                    text-anchor="right"
                     alignment-baseline="middle"
                     class="connetor-name"
-                    fill="white"
-                    filter="url(#filter-6)"
-                    sketch:type="MSTextLayer"
-                    font-family="Arial"
-                    font-size="10"
                     >
                 <tspan
                         ng-attr-x="{{connector.x()-connectorSize/2}}"
                         ng-attr-y="{{connector.y()-13}}"
-                        fill="#A2A2A2">
+                        >
                     {{connector.name()}}
                 </tspan>
             </text>
@@ -484,12 +474,10 @@
         </g>
         <text
                 class="node-name"
-                sketch:type="MSTextLayer"
-                transform="scale(0.042)"
         >
                     <tspan
-                            ng-attr-x="{{node.width()/2-node.width()/4}}"
-                            y="-120"
+                            x="0"
+                            y="-6"
                             >
                         {{node.name()}}
                     </tspan>
@@ -507,12 +495,13 @@
                      C {{connection.sourceTangentX()}}, {{connection.sourceTangentY()}}
                        {{connection.destTangentX()}}, {{connection.destTangentY()}}
                        {{connection.destCoordX()}}, {{connection.destCoordY()}}"
+                    ng-attr-stroke-opacity="{{connection.opacity}}"
                     >
             </path>
             <circle
                     ng-mousedown="connectedConnectorMouseDown($event, connection)"
                     ng-attr-class="{{connection.selected() && 'selected-connection-endpoint' || (connection == mouseOverConnection && 'mouseover-connection-endpoint' || 'connection-endpoint')}}"
-                    ng-attr-r="{{connectorSize*2.5}}"
+                    ng-attr-r="{{connectorSize*1.2}}"
                     ng-attr-cx="{{connection.sourceCoordX()}}"
                     ng-attr-cy="{{connection.sourceCoordY()}}"
                     >
@@ -520,7 +509,7 @@
             <circle
                     ng-mousedown="connectedConnectorMouseDown($event, connection)"
                     ng-attr-class="{{connection.selected() && 'selected-connection-endpoint' || (connection == mouseOverConnection && 'mouseover-connection-endpoint' || 'connection-endpoint')}}"
-                    ng-attr-r="{{connectorSize*2.5}}"
+                    ng-attr-r="{{connectorSize*1.2}}"
                     ng-attr-cx="{{connection.destCoordX()}}"
                     ng-attr-cy="{{connection.destCoordY()}}"
                     >

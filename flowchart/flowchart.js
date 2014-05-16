@@ -130,7 +130,15 @@
         }
       };
       $scope.mouseMove = function(evt) {
-        var mouseOverElement, scope;
+        var connection, mouseOverElement, scope, _fn, _i, _len, _ref;
+        _ref = $scope.chart.connections;
+        _fn = function(connection) {
+          return connection.opacity = connection.distance() / 2000;
+        };
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          connection = _ref[_i];
+          _fn(connection);
+        }
         $scope.mouseOverConnection = null;
         $scope.mouseOverConnector = null;
         $scope.mouseOverNode = null;

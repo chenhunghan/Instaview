@@ -120,7 +120,6 @@ angular.module("topo", []).factory( "d3", [ () ->
       .size([width, height])
       .gravity(0.25)
       .on 'tick', (a)->
-        console.log a
         if a.alpha < 0.0367 and did_not_call is true
           did_not_call = false
           force.nodes().forEach (o, i) ->

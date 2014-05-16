@@ -21,15 +21,15 @@
     function() {
       var node;
       node = this;
-      node.width = 70;
-      node.padding = 12;
-      node.nodeNameHeight = 70;
+      node.width = 60;
+      node.padding = 15;
+      node.nodeNameHeight = 50;
     }
   ]).service("connector", [
     "node", function(node) {
       var connector;
       connector = this;
-      connector.connectorHeight = 56;
+      connector.connectorHeight = 46;
       connector.ConnectorViewModel = function(connectorDataModel, x, y, parentNode) {
         if (x === 0) {
           x = x + node.padding;
@@ -107,7 +107,7 @@
         this.height = function() {
           var numConnectors;
           numConnectors = Math.max(this.inputConnectors.length, this.outputConnectors.length);
-          return flowchart.computeConnectorY(numConnectors);
+          return flowchart.computeConnectorY(numConnectors) - 25;
         };
         this.select = function() {
           this._selected = true;
@@ -201,6 +201,16 @@
         this.destTangentY = function() {
           return flowchart.computeConnectionDestTangentY(this.sourceCoord(), this.destCoord());
         };
+        this.distance = function() {
+          var dd, dx, dy;
+          dd = function(a) {
+            return a * a;
+          };
+          dx = this.destCoordX() - this.sourceCoordX();
+          dy = this.destCoordY() - this.sourceCoordY();
+          return Math.sqrt(dd(dx) + dd(dy));
+        };
+        this.opacity = 0.2;
         this.select = function() {
           this._selected = true;
         };

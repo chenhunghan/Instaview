@@ -10,13 +10,13 @@ debug.assertObjectValid = (obj) ->
 
 angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", [() ->
   node = this
-  node.width = 70
-  node.padding = 12
-  node.nodeNameHeight = 70
+  node.width = 60
+  node.padding = 15
+  node.nodeNameHeight = 50
   return
 ]).service("connector", ["node", (node) ->
   connector = this
-  connector.connectorHeight = 56
+  connector.connectorHeight = 46
   # View model for a connector.
   connector.ConnectorViewModel = (connectorDataModel, x, y, parentNode) ->
     if x is 0
@@ -89,7 +89,7 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
     # Height of the node.
     @height = ->
       numConnectors = Math.max(@inputConnectors.length, @outputConnectors.length)
-      flowchart.computeConnectorY numConnectors
+      flowchart.computeConnectorY(numConnectors)-25
     # Select the node.
     @select = ->
       @_selected = true
@@ -161,6 +161,12 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
       flowchart.computeConnectionDestTangentX @sourceCoord(), @destCoord()
     @destTangentY = ->
       flowchart.computeConnectionDestTangentY @sourceCoord(), @destCoord()
+    @distance = ->
+      dd = (a) -> a*a
+      dx = @destCoordX() - @sourceCoordX()
+      dy = @destCoordY() - @sourceCoordY()
+      return Math.sqrt( dd(dx) + dd(dy) )
+    @opacity = 0.2
     # Select the connection.
     @select = ->
       @_selected = true

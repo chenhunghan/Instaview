@@ -30,7 +30,7 @@ Styles for nodes and connectors.
 }
 
 .mouseover-node-rect {
-    stroke: rgba(0,0,0,002);
+    stroke: rgba(0,0,0,0005);
     stroke-width: 0.2;
 }
 
@@ -40,10 +40,10 @@ Styles for nodes and connectors.
     font-weight: normal;
     line-spacing: 30;
     fill: #000000;
-    fill-opacity: 0.3;
+    fill-opacity: 0.5;
 }
 .node-name:hover {
-    fill-opacity:0.7;
+    fill-opacity:0.8;
 }
 
 
@@ -64,10 +64,20 @@ Styles for nodes and connectors.
 }
 
 .mouseover-connector-circle{
-
+    fill: rgba(255,255,255,1);
+    stroke: rgba(0,0,0,0.3);
+    stroke-width: 1;
 }
 
-
+.connetor-name {
+    font-family: Arial;
+    font-size: 11px;
+    fill: rgba(0,0,0,0.4);
+    text-shadow: 1 1 0px white;
+}
+.connetor-name:hover {
+    fill: rgba(0,0,0,0.7);
+}
 
 /*
 Style for connections.
@@ -77,8 +87,8 @@ Style for connections.
 }
 
 .connection-line {
-    stroke: rgba(0,0,0,0.05);
-    stroke-width: 4;
+    stroke: rgba(0,0,0,0.5);
+    stroke-width: 2;
     fill: transparent;
     z-index:3;
 }
@@ -100,11 +110,11 @@ Style for connections.
 }
 
 .selected-connection-endpoint {
-    fill: red;
+    fill: rgba(255,0,0,0.05);
 }
 
 .mouseover-connection-endpoint {
-    fill: rgba(0,0,0,0);
+    fill: transparent;
 }
 
 /*
@@ -130,7 +140,7 @@ The element (in this case the SVG element) that contains the draggable elements.
 */
 
 .draggable-container {
-    border: solid 1px blue;
+    border: dashed 1px rgba(0,0,0,0.2);
 
 }
 

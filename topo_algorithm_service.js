@@ -263,7 +263,6 @@
           width = flowchartDataModel.width;
           height = flowchartDataModel.height;
           force = d3.layout.force().nodes(data.nodes).links(data.links).charge(-4800).linkDistance(120).size([width, height]).gravity(0.25).on('tick', function(a) {
-            console.log(a);
             if (a.alpha < 0.0367 && did_not_call === true) {
               did_not_call = false;
               force.nodes().forEach(function(o, i) {
