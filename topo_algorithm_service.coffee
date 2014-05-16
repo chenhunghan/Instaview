@@ -1,7 +1,7 @@
 angular.module("topo", []).factory( "d3", [ () ->
   d3
 ]).factory( "topoAlgorithm", ["d3", "flowchartDataModel", (d3, flowchartDataModel) ->
-  preProcess: (raw, cb) ->
+  preProcess: (raw, cb, mode) ->
     grings = {}
     gnodes = []
     glinks = []
@@ -108,13 +108,39 @@ angular.module("topo", []).factory( "d3", [ () ->
       nodes: gnodes
       rings: grings
     final.links = links
-    @processPosdata(final, cb)
+
+    data = {}
+    #console.log nodes_w_pos
+    for link in final.links
+      if link.sourceport >6
+        final.nodes[final.nodes.indexOf(link.source)].outputConnectors.push
+          name: link.sourceport
+      if link.sourceport <6 or link.sourceport is 6
+        final.nodes[final.nodes.indexOf(link.source)].inputConnectors.push
+          name: link.sourceport
+      if link.targetport >6
+        final.nodes[final.nodes.indexOf(link.target)].outputConnectors.push
+          name: link.targetport
+      if link.targetport <6 or link.targetport is 6
+        final.nodes[final.nodes.indexOf(link.target)].inputConnectors.push
+          name: link.targetport
+    for link in final.links
+      link.source.nodeID = link.source.id
+      #link.source.connectorIndex = link.sourceport
+      link.dest.nodeID = link.target.id
+    #link.dest.connectorIndex = link.targetport
+    data.nodes = final.nodes
+    data.connections = final.links
+    if mode is 'noPos'
+      cb(data)
+    else
+      @processPosdata(data, cb)
   processPosdata: (data, cb) ->
     that = @
     did_not_call = true
     width = flowchartDataModel.width
     height = flowchartDataModel.height
-    force = d3.layout.force().nodes(data.nodes).links(data.links)
+    force = d3.layout.force().nodes(data.nodes).links(data.connections)
       .charge(-4800)
       .linkDistance(120)
       .size([width, height])
@@ -135,27 +161,8 @@ angular.module("topo", []).factory( "d3", [ () ->
       ++i
     force.stop()
   finalize:(nodes_w_pos, links_w_pos, cb) ->
-    data = {}
-    #console.log nodes_w_pos
-    for link in links_w_pos
-      if link.sourceport >6
-        nodes_w_pos[nodes_w_pos.indexOf(link.source)].outputConnectors.push
-          name: link.sourceport
-      if link.sourceport <6 or link.sourceport is 6
-        nodes_w_pos[nodes_w_pos.indexOf(link.source)].inputConnectors.push
-          name: link.sourceport
-      if link.targetport >6
-        nodes_w_pos[nodes_w_pos.indexOf(link.target)].outputConnectors.push
-          name: link.targetport
-      if link.targetport <6 or link.targetport is 6
-        nodes_w_pos[nodes_w_pos.indexOf(link.target)].inputConnectors.push
-          name: link.targetport
-    for link in links_w_pos
-      link.source.nodeID = link.source.id
-      #link.source.connectorIndex = link.sourceport
-      link.dest.nodeID = link.target.id
-      #link.dest.connectorIndex = link.targetport
-    data.nodes = nodes_w_pos
-    data.connections = links_w_pos
+    data =
+      nodes: nodes_w_pos
+      connections: links_w_pos
     cb(data)
 ])

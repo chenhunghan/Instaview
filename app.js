@@ -542,7 +542,7 @@
     "$scope", "$http", "prompt", "flowchartDataModel", "topoAlgorithm", AppCtrl = function($scope, $http, prompt, flowchartDataModel, topoAlgorithm) {
       var ADown, InitialNodeX, InitialNodeY, aKeyCode, ctrlDown, ctrlKeyCode, ctrlKeyCodeMac, deleteKeyCode, deleteKeyCodeMac, escKeyCode, nextNodeID, preventDefaultAction;
       $http.get('resource/topo_for_debug.json').success(function(topd) {
-        var cb, dev, ip, raw;
+        var cb, dev, ip, noPoscb, raw;
         raw = (function() {
           var _results;
           _results = [];
@@ -627,6 +627,11 @@
           };
           return $scope.chartViewModel = new flowchartDataModel.ChartViewModel(data);
         };
+        noPoscb = function(data) {
+          console.log(data.nodes);
+          return $scope.nodelist = data.nodes;
+        };
+        topoAlgorithm.preProcess(raw, noPoscb, 'noPos');
         return topoAlgorithm.preProcess(raw, cb);
       });
       deleteKeyCode = 46;

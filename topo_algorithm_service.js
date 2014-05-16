@@ -9,8 +9,8 @@
   ]).factory("topoAlgorithm", [
     "d3", "flowchartDataModel", function(d3, flowchartDataModel) {
       return {
-        preProcess: function(raw, cb) {
-          var add_to_linkset, blkports, d, enhanced_equlink, final, find_dup_n, find_linkidx, find_node_idx, glinks, gnodes, grings, i, l, link, linkidx, links, mring, n, n0, n1, node, omit_dup, p, r, rid, ring, rlinkidx, rnode, upports, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _m, _n, _o, _p, _q, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+        preProcess: function(raw, cb, mode) {
+          var add_to_linkset, blkports, d, data, enhanced_equlink, final, find_dup_n, find_linkidx, find_node_idx, glinks, gnodes, grings, i, l, link, linkidx, links, mring, n, n0, n1, node, omit_dup, p, r, rid, ring, rlinkidx, rnode, upports, _fn, _i, _j, _k, _l, _len, _len1, _len10, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _len9, _m, _n, _o, _p, _q, _r, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _s;
           grings = {};
           gnodes = [];
           glinks = [];
@@ -254,7 +254,44 @@
             rings: grings
           };
           final.links = links;
-          return this.processPosdata(final, cb);
+          data = {};
+          _ref6 = final.links;
+          for (_r = 0, _len9 = _ref6.length; _r < _len9; _r++) {
+            link = _ref6[_r];
+            if (link.sourceport > 6) {
+              final.nodes[final.nodes.indexOf(link.source)].outputConnectors.push({
+                name: link.sourceport
+              });
+            }
+            if (link.sourceport < 6 || link.sourceport === 6) {
+              final.nodes[final.nodes.indexOf(link.source)].inputConnectors.push({
+                name: link.sourceport
+              });
+            }
+            if (link.targetport > 6) {
+              final.nodes[final.nodes.indexOf(link.target)].outputConnectors.push({
+                name: link.targetport
+              });
+            }
+            if (link.targetport < 6 || link.targetport === 6) {
+              final.nodes[final.nodes.indexOf(link.target)].inputConnectors.push({
+                name: link.targetport
+              });
+            }
+          }
+          _ref7 = final.links;
+          for (_s = 0, _len10 = _ref7.length; _s < _len10; _s++) {
+            link = _ref7[_s];
+            link.source.nodeID = link.source.id;
+            link.dest.nodeID = link.target.id;
+          }
+          data.nodes = final.nodes;
+          data.connections = final.links;
+          if (mode === 'noPos') {
+            return cb(data);
+          } else {
+            return this.processPosdata(data, cb);
+          }
         },
         processPosdata: function(data, cb) {
           var did_not_call, force, height, i, n, that, width;
@@ -262,7 +299,7 @@
           did_not_call = true;
           width = flowchartDataModel.width;
           height = flowchartDataModel.height;
-          force = d3.layout.force().nodes(data.nodes).links(data.links).charge(-4800).linkDistance(120).size([width, height]).gravity(0.25).on('tick', function(a) {
+          force = d3.layout.force().nodes(data.nodes).links(data.connections).charge(-4800).linkDistance(120).size([width, height]).gravity(0.25).on('tick', function(a) {
             if (a.alpha < 0.0367 && did_not_call === true) {
               did_not_call = false;
               force.nodes().forEach(function(o, i) {
@@ -283,38 +320,11 @@
           return force.stop();
         },
         finalize: function(nodes_w_pos, links_w_pos, cb) {
-          var data, link, _i, _j, _len, _len1;
-          data = {};
-          for (_i = 0, _len = links_w_pos.length; _i < _len; _i++) {
-            link = links_w_pos[_i];
-            if (link.sourceport > 6) {
-              nodes_w_pos[nodes_w_pos.indexOf(link.source)].outputConnectors.push({
-                name: link.sourceport
-              });
-            }
-            if (link.sourceport < 6 || link.sourceport === 6) {
-              nodes_w_pos[nodes_w_pos.indexOf(link.source)].inputConnectors.push({
-                name: link.sourceport
-              });
-            }
-            if (link.targetport > 6) {
-              nodes_w_pos[nodes_w_pos.indexOf(link.target)].outputConnectors.push({
-                name: link.targetport
-              });
-            }
-            if (link.targetport < 6 || link.targetport === 6) {
-              nodes_w_pos[nodes_w_pos.indexOf(link.target)].inputConnectors.push({
-                name: link.targetport
-              });
-            }
-          }
-          for (_j = 0, _len1 = links_w_pos.length; _j < _len1; _j++) {
-            link = links_w_pos[_j];
-            link.source.nodeID = link.source.id;
-            link.dest.nodeID = link.target.id;
-          }
-          data.nodes = nodes_w_pos;
-          data.connections = links_w_pos;
+          var data;
+          data = {
+            nodes: nodes_w_pos,
+            connections: links_w_pos
+          };
           return cb(data);
         }
       };

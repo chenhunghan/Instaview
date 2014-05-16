@@ -553,6 +553,11 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
           ]
         $scope.chartViewModel = new flowchartDataModel.ChartViewModel(data)
         #console.log 'this is callback'
+      noPoscb = (data) ->
+        console.log data.nodes
+        $scope.nodelist = data.nodes
+      #topoAlgorithm.preProcess(raw, cb)
+      topoAlgorithm.preProcess(raw, noPoscb, 'noPos')
       topoAlgorithm.preProcess(raw, cb)
     # Code for the delete key.
     deleteKeyCode = 46

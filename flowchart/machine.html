@@ -384,7 +384,14 @@
             </feMerge>
         </filter>
     </defs>
-
+    <g
+            ng-repeat="node in chart.nodes"
+            class="nodelist"
+            >
+        <text ng-attr-transform="translate(20, {{$index*20+40}})">{{node.data.name}}</text>
+        <text ng-attr-transform="translate(140, {{$index*20+40}})">{{node.data.ip}}</text>
+        <text ng-attr-transform="translate(260, {{$index*20+40}})">{{node.data.mac}}</text>
+    </g>
     <g
             ng-repeat="node in chart.nodes"
             ng-mousedown="nodeMouseDown($event, node)"
@@ -553,6 +560,7 @@
             ng-attr-y="{{dragSelectionRect.y}}"
             ng-attr-width="{{dragSelectionRect.width}}"
             ng-attr-height="{{dragSelectionRect.height}}"
+            stroke-dasharray="10,5"
             >
     </rect>
 

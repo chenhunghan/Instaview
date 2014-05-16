@@ -46,9 +46,6 @@ Styles for nodes and connectors.
     fill-opacity:0.8;
 }
 
-
-
-
 /*connector*/
 
 .connector-circle{
@@ -149,8 +146,16 @@ Drag selection rectangle.
 */
 
 .drag-selection-rect {
-    stroke: blue;
+    stroke: rgba(255,0,0,0.4);
     stroke-width: 2;
-    fill: transparent;
+    fill: rgba(255,0,0,0.03);
 }
 
+/*
+node list
+*/
+
+.nodelist {
+    font-size:12px;
+    fill:rgba(0,0,0,0.15);
+}

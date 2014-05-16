@@ -16,39 +16,45 @@
 
 		<div style="width: 100%">
 		    <div>
-    			<button
-    				ng-click="addNewNode()"
-    				title="Add a new node to the chart"
-    				>
-    				Add Node
-				</button>
-    			<button
-    				ng-click="addNewInputConnector()"
-    				ng-disabled="chartViewModel.getSelectedNodes().length == 0"
-    				title="Add a new input connector to the selected node"
-    				>
-    				Add Input Connector
-				</button>
-    			<button
-    				ng-click="addNewOutputConnector()"
-    				ng-disabled="chartViewModel.getSelectedNodes().length == 0"
-    				title="Add a new output connector to the selected node"
-    				>
-    				Add Output Connector
-				</button>
-    			<button
-    				ng-click="deleteSelected()"
-    				ng-disabled="chartViewModel.getSelectedNodes().length == 0 && chartViewModel.getSelectedConnections().length == 0"
-    				title="Delete selected nodes and connections"
-    				>
-    				Delete Selected
-				</button>
-                <button
-                    ng-click="print()"
-                    >
-                    print
-                 </button>
-
+                <div class="btn-group">
+                    <button
+                        ng-click="addNewNode()"
+                        title="Add a new node to the chart"
+                        class="btn btn-default btn-xs"
+                        >
+                        Add Node
+                    </button>
+                    <button
+                        ng-click="addNewInputConnector()"
+                        ng-disabled="chartViewModel.getSelectedNodes().length == 0"
+                        title="Add a new input connector to the selected node"
+                        class="btn btn-default btn-xs"
+                        >
+                        Add Input Connector
+                    </button>
+                    <button
+                        ng-click="addNewOutputConnector()"
+                        ng-disabled="chartViewModel.getSelectedNodes().length == 0"
+                        title="Add a new output connector to the selected node"
+                        class="btn btn-default btn-xs"
+                        >
+                        Add Output Connector
+                    </button>
+                    <button
+                        ng-click="deleteSelected()"
+                        ng-disabled="chartViewModel.getSelectedNodes().length == 0 && chartViewModel.getSelectedConnections().length == 0"
+                        title="Delete selected nodes and connections"
+                        class="btn btn-default btn-xs"
+                        >
+                        Delete Selected
+                    </button>
+                    <button
+                        ng-click="print()"
+                        class="btn btn-default btn-xs"
+                        >
+                        print
+                     </button>
+                </div>
 				<!--
 				This custom element defines the flowchart.
 				-->
