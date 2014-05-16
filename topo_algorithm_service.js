@@ -7,7 +7,7 @@
       return d3;
     }
   ]).factory("topoAlgorithm", [
-    "d3", function(d3) {
+    "d3", "flowchartDataModel", function(d3, flowchartDataModel) {
       return {
         preProcess: function(raw, cb) {
           var add_to_linkset, blkports, d, enhanced_equlink, final, find_dup_n, find_linkidx, find_node_idx, glinks, gnodes, grings, i, l, link, linkidx, links, mring, n, n0, n1, node, omit_dup, p, r, rid, ring, rlinkidx, rnode, upports, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _m, _n, _o, _p, _q, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
@@ -244,6 +244,7 @@
             links.push({
               source: gnodes[l.nodepair[0]],
               target: gnodes[l.nodepair[1]],
+              dest: {},
               sourceport: l.portpair[0],
               targetport: l.portpair[1]
             });
@@ -256,17 +257,24 @@
           return this.processPosdata(final, cb);
         },
         processPosdata: function(data, cb) {
-          var did_not_call, force, i, n, that;
+          var did_not_call, force, height, i, n, that, width;
           that = this;
           did_not_call = true;
-          force = d3.layout.force().nodes(data.nodes).links(data.links).charge(-1800).linkDistance(50).size([500, 500]).gravity(0.1).on('tick', function(a) {
-            if (a.alpha < 0.0051 && did_not_call === true) {
+          width = flowchartDataModel.width;
+          height = flowchartDataModel.height;
+          force = d3.layout.force().nodes(data.nodes).links(data.links).charge(-4800).linkDistance(120).size([width, height]).gravity(0.25).on('tick', function(a) {
+            console.log(a);
+            if (a.alpha < 0.0367 && did_not_call === true) {
               did_not_call = false;
+              force.nodes().forEach(function(o, i) {
+                o.x = o.x * 1.5 - 350;
+                return o.y = o.y * 0.6 + 30;
+              });
               that.finalize(force.nodes(), force.links(), cb);
               return force.stop();
             }
           });
-          n = 10000;
+          n = 100;
           force.start();
           i = 0;
           while (i < n) {
@@ -280,17 +288,22 @@
           data = {};
           for (_i = 0, _len = links_w_pos.length; _i < _len; _i++) {
             link = links_w_pos[_i];
-            if (link.sourceport > 6 || link.targetport > 6) {
+            if (link.sourceport > 6) {
               nodes_w_pos[nodes_w_pos.indexOf(link.source)].outputConnectors.push({
                 name: link.sourceport
               });
-              nodes_w_pos[nodes_w_pos.indexOf(link.target)].outputConnectors.push({
-                name: link.targetport
-              });
-            } else {
+            }
+            if (link.sourceport < 6 || link.sourceport === 6) {
               nodes_w_pos[nodes_w_pos.indexOf(link.source)].inputConnectors.push({
                 name: link.sourceport
               });
+            }
+            if (link.targetport > 6) {
+              nodes_w_pos[nodes_w_pos.indexOf(link.target)].outputConnectors.push({
+                name: link.targetport
+              });
+            }
+            if (link.targetport < 6 || link.targetport === 6) {
               nodes_w_pos[nodes_w_pos.indexOf(link.target)].inputConnectors.push({
                 name: link.targetport
               });
@@ -299,10 +312,7 @@
           for (_j = 0, _len1 = links_w_pos.length; _j < _len1; _j++) {
             link = links_w_pos[_j];
             link.source.nodeID = link.source.id;
-            link.source.connectorIndex = link.sourceport;
-            link.dest = {};
             link.dest.nodeID = link.target.id;
-            link.dest.connectorIndex = link.targetport;
           }
           data.nodes = nodes_w_pos;
           data.connections = links_w_pos;

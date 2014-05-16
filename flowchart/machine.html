@@ -6,6 +6,8 @@
         ng-mousedown="mouseDown($event)"
         ng-mousemove="mouseMove($event)"
         class="draggable-container"
+        ng-attr-width="{{chart.width}}"
+        ng-attr-height="{{chart.height}}"
         >
     <defs>
         <linearGradient x1="49.300617%" y1="-22.5833453%" x2="50.0000477%" y2="100%" id="linearGradient-1">
@@ -14,33 +16,26 @@
             <stop stop-color="#EEEEEE" offset="98.0440949%"></stop>
             <stop stop-color="#CECECE" offset="100%"></stop>
         </linearGradient>
-        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-2">
-            <feOffset dx="0" dy="0" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.0684980752 0" in="shadowBlurOuter1" type="matrix" result="shadowMatrixOuter1"></feColorMatrix>
-            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter2"></feOffset>
-            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter2" result="shadowBlurOuter2"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.35 0" in="shadowBlurOuter2" type="matrix" result="shadowMatrixOuter2"></feColorMatrix>
-            <feOffset dx="0" dy="4" in="SourceAlpha" result="shadowOffsetInner1"></feOffset>
-            <feGaussianBlur stdDeviation="2" in="shadowOffsetInner1" result="shadowBlurInner1"></feGaussianBlur>
-            <feComposite in="shadowBlurInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"></feComposite>
-            <feColorMatrix values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.514906939 0" in="shadowInnerInner1" type="matrix" result="shadowMatrixInner1"></feColorMatrix>
-            <feOffset dx="-1" dy="0" in="SourceAlpha" result="shadowOffsetInner2"></feOffset>
-            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetInner2" result="shadowBlurInner2"></feGaussianBlur>
-            <feComposite in="shadowBlurInner2" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner2"></feComposite>
-            <feColorMatrix values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.7 0" in="shadowInnerInner2" type="matrix" result="shadowMatrixInner2"></feColorMatrix>
-            <feOffset dx="1" dy="0" in="SourceAlpha" result="shadowOffsetInner3"></feOffset>
-            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetInner3" result="shadowBlurInner3"></feGaussianBlur>
-            <feComposite in="shadowBlurInner3" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner3"></feComposite>
-            <feColorMatrix values="0 0 0 0 1   0 0 0 0 1   0 0 0 0 1  0 0 0 0.7 0" in="shadowInnerInner3" type="matrix" result="shadowMatrixInner3"></feColorMatrix>
-            <feMerge>
-                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
-                <feMergeNode in="shadowMatrixOuter2"></feMergeNode>
-                <feMergeNode in="SourceGraphic"></feMergeNode>
-                <feMergeNode in="shadowMatrixInner1"></feMergeNode>
-                <feMergeNode in="shadowMatrixInner2"></feMergeNode>
-                <feMergeNode in="shadowMatrixInner3"></feMergeNode>
-            </feMerge>
+        <filter id="node-shadow" x="0" y="0" width="250%" height="250%">
+            <feOffset result="offOut" in="SourceGraphic" dx="0" dy="0" />
+            <feColorMatrix result="matrixOut" in="offOut" type="matrix"
+                           values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" />
+            <feGaussianBlur result="blurOut" in="matrixOut" stdDeviation="2" />
+            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+        </filter>
+        <filter id="node-mouseover-shadow" x="0" y="0" width="250%" height="250%">
+            <feOffset result="offOut" in="SourceGraphic" dx="2.5" dy="2.5" />
+            <feColorMatrix result="matrixOut" in="offOut" type="matrix"
+                           values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.35 0" />
+            <feGaussianBlur result="blurOut" in="matrixOut" stdDeviation="2" />
+            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+        </filter>
+        <filter id="node-selected-shadow" x="0" y="0" width="250%" height="250%">
+            <feOffset result="offOut" in="SourceGraphic" dx="1" dy="1" />
+            <feColorMatrix result="matrixOut" in="offOut" type="matrix"
+                           values="0.781 0.994 -0.775 0 0, -0.015 0.731 0.285 0 0, 0.798 -0.257 0.459 0 0, 0 0 0 1 0" />
+            <feGaussianBlur result="blurOut" in="matrixOut" stdDeviation="2" />
+            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
         </filter>
         <rect id="path-3" x="0" y="1" width="125" height="294" rx="3"></rect>
         <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-4">
@@ -390,7 +385,6 @@
         </filter>
     </defs>
 
-
     <g
             ng-repeat="node in chart.nodes"
             ng-mousedown="nodeMouseDown($event, node)"
@@ -398,43 +392,38 @@
             >
         <g
                 ng-attr-class="{{node.selected() && 'selected-node-rect' || (node == mouseOverNode && 'mouseover-node-rect' || 'node-rect')}}"
-                filter="url(#filter-2)"
+                ng-attr-filter="url({{node.selected() && '#node-selected-shadow' || (node == mouseOverNode && '#node-mouseover-shadow' || '#node-shadow')}})"
                 >
                     <rect
                             x="0"
                             y="1"
                             ng-attr-width="{{node.width()}}"
                             ng-attr-height="{{node.height()}}"
-                            rx="3"
+                            rx="2"
+                            ry="2"
                             fill="url(#linearGradient-1)"
                             fill-rule="evenodd"
                             >
-
                     </rect>
         </g>
         <g
                 ng-repeat="connector in node.inputConnectors"
                 ng-mousedown="connectorMouseDown($event, node, connector, $index, true)"
-                class="connector input-connector"
+                class="input-connector"
                 >
             <circle
                     ng-attr-class="{{connector == mouseOverConnector && 'mouseover-connector-circle' || 'connector-circle'}}"
                     ng-attr-r="{{connectorSize}}"
                     ng-attr-cx="{{connector.x()}}"
                     ng-attr-cy="{{connector.y()}}"
-                    fill="#717171"
-                    filter="url(#filter-4)"
-                    sketch:type="MSShapeGroup"
                     >
             </circle>
             <circle
-                    ng-attr-r="{{connectorSize*0.7}}"
+                    ng-attr-r="{{connectorSize*0.6}}"
                     ng-attr-cx="{{connector.x()}}"
                     ng-attr-cy="{{connector.y()}}"
-                    class="inner"
-                    fill="#333333"
-                    filter="url(#filter-5)"
-                    sketch:type="MSShapeGroup">
+                    class="connector-inner-circle"
+                    >
             </circle>
             <text
                     text-anchor="left"
@@ -458,26 +447,21 @@
         <g
                 ng-repeat="connector in node.outputConnectors"
                 ng-mousedown="connectorMouseDown($event, node, connector, $index, false)"
-                class="connector output-connector"
+                class="output-connector"
                 >
             <circle
                     ng-attr-class="{{connector == mouseOverConnector && 'mouseover-connector-circle' || 'connector-circle'}}"
                     ng-attr-r="{{connectorSize}}"
                     ng-attr-cx="{{connector.x()}}"
                     ng-attr-cy="{{connector.y()}}"
-                    fill="#717171"
-                    filter="url(#filter-4)"
-                    sketch:type="MSShapeGroup"
                     >
             </circle>
             <circle
                     ng-attr-r="{{connectorSize*0.7}}"
                     ng-attr-cx="{{connector.x()}}"
                     ng-attr-cy="{{connector.y()}}"
-                    class="inner"
-                    fill="#333333"
-                    filter="url(#filter-5)"
-                    sketch:type="MSShapeGroup">
+                    class="connector-inner-circle"
+                    >
             </circle>
             <text
                     text-anchor="left"
@@ -500,19 +484,13 @@
         </g>
         <text
                 class="node-name"
-                fill-opacity="0.513298483"
-                fill="#000000"
-                filter="url(#filter-28)"
                 sketch:type="MSTextLayer"
-                font-family="Courier New"
-                font-size="16"
-                font-weight="normal"
-                line-spacing="30"
-                letter-spacing="-1"
+                transform="scale(0.042)"
         >
                     <tspan
                             ng-attr-x="{{node.width()/2-node.width()/4}}"
-                            y="25">
+                            y="-120"
+                            >
                         {{node.name()}}
                     </tspan>
         </text>
@@ -534,7 +512,7 @@
             <circle
                     ng-mousedown="connectedConnectorMouseDown($event, connection)"
                     ng-attr-class="{{connection.selected() && 'selected-connection-endpoint' || (connection == mouseOverConnection && 'mouseover-connection-endpoint' || 'connection-endpoint')}}"
-                    ng-attr-r="{{connectorSize*0.6}}"
+                    ng-attr-r="{{connectorSize*2.5}}"
                     ng-attr-cx="{{connection.sourceCoordX()}}"
                     ng-attr-cy="{{connection.sourceCoordY()}}"
                     >
@@ -542,7 +520,7 @@
             <circle
                     ng-mousedown="connectedConnectorMouseDown($event, connection)"
                     ng-attr-class="{{connection.selected() && 'selected-connection-endpoint' || (connection == mouseOverConnection && 'mouseover-connection-endpoint' || 'connection-endpoint')}}"
-                    ng-attr-r="{{connectorSize*0.6}}"
+                    ng-attr-r="{{connectorSize*2.5}}"
                     ng-attr-cx="{{connection.destCoordX()}}"
                     ng-attr-cy="{{connection.destCoordY()}}"
                     >

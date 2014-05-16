@@ -2,36 +2,27 @@
 # Debug utilities.
 throw new Error("debug object already defined!")  if typeof debug isnt "undefined"
 debug = {}
-
 # Assert that an object is valid.
 debug.assertObjectValid = (obj) ->
   throw new Exception("Invalid object!")  unless obj
   throw new Error("Input is not an object! It is a " + typeof (obj))  if $.isPlainObject(obj)
 
-ngapp = angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo'])
 
-ngapp.service "flowchartDataModel", [ ()->
-  flowchart = this
-  # Width of a node.
-  flowchart.nodeWidth = 125
-  flowchart.padding = 22
-  # Amount of space reserved for displaying the node's name.
-  flowchart.nodeNameHeight = 70
-  # Height of a connector in a node.
-  flowchart.connectorHeight = 56
-  # Compute the Y coordinate of a connector, given its index.
-  flowchart.computeConnectorY = (connectorIndex) ->
-    flowchart.nodeNameHeight + (connectorIndex * flowchart.connectorHeight)
-  # Compute the position of a connector in the graph.
-  flowchart.computeConnectorPos = (node, connectorIndex, inputConnector) ->
-    x: node.x() + (if inputConnector then flowchart.padding else (flowchart.nodeWidth - flowchart.padding))
-    y: node.y() + flowchart.computeConnectorY(connectorIndex)
+angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", [() ->
+  node = this
+  node.width = 70
+  node.padding = 12
+  node.nodeNameHeight = 70
+  return
+]).service("connector", ["node", (node) ->
+  connector = this
+  connector.connectorHeight = 56
   # View model for a connector.
-  flowchart.ConnectorViewModel = (connectorDataModel, x, y, parentNode) ->
+  connector.ConnectorViewModel = (connectorDataModel, x, y, parentNode) ->
     if x is 0
-      x = x + flowchart.padding
+      x = x + node.padding
     else
-      x = x - flowchart.padding
+      x = x - node.padding
     @data = connectorDataModel
     @_parentNode = parentNode
     @_x = x
@@ -49,18 +40,34 @@ ngapp.service "flowchartDataModel", [ ()->
     @parentNode = ->
       @_parentNode
     return
-  # Create view model for a list of data models.
-  createConnectorsViewModel = (connectorDataModels, x, parentNode) ->
-    viewModels = []
-    if connectorDataModels
-      i = 0
-      while i < connectorDataModels.length
-        connectorViewModel = new flowchart.ConnectorViewModel(connectorDataModels[i], x, flowchart.computeConnectorY(i), parentNode)
-        viewModels.push connectorViewModel
-        ++i
-    viewModels
+  return
+]).service("flowchartDataModel", [ "node", "connector", (node, connector)->
+  flowchart = this
+  flowchart.width = 1300
+  flowchart.height = 600
+  flowchart.nodeWidth = node.width
+  flowchart.padding = node.padding
+  flowchart.nodeNameHeight = node.nodeNameHeight
+  flowchart.connectorHeight = connector.connectorHeight
+  # Compute the Y coordinate of a connector, given its index.
+  flowchart.computeConnectorY = (connectorIndex) ->
+    flowchart.nodeNameHeight + (connectorIndex * flowchart.connectorHeight)
+  # Compute the position of a connector in the graph.
+  flowchart.computeConnectorPos = (node, connectorIndex, inputConnector) ->
+    x: node.x() + (if inputConnector then flowchart.padding else (flowchart.nodeWidth - flowchart.padding))
+    y: node.y() + flowchart.computeConnectorY(connectorIndex)
   # View model for a node.
   flowchart.NodeViewModel = (nodeDataModel) ->
+    # Create view model for a list of data models.
+    createConnectorsViewModel = (connectorDataModels, x, parentNode) ->
+      viewModels = []
+      if connectorDataModels
+        i = 0
+        while i < connectorDataModels.length
+          connectorViewModel = new connector.ConnectorViewModel(connectorDataModels[i], x, flowchart.computeConnectorY(i), parentNode)
+          viewModels.push connectorViewModel
+          ++i
+      viewModels
     #padding = 18 #padding space for each connector
     @data = nodeDataModel
     @inputConnectors = createConnectorsViewModel(@data.inputConnectors, 0, this)
@@ -100,7 +107,7 @@ ngapp.service "flowchartDataModel", [ ()->
       @_selected
     # Internal function to add a connector.
     @_addConnector = (connectorDataModel, x, connectorsDataModel, connectorsViewModel) ->
-      connectorViewModel = new flowchart.ConnectorViewModel(connectorDataModel, x, flowchart.computeConnectorY(connectorsViewModel.length), this)
+      connectorViewModel = new connector.ConnectorViewModel(connectorDataModel, x, flowchart.computeConnectorY(connectorsViewModel.length), this)
       connectorsDataModel.push connectorDataModel
       # Add to node's view model.
       connectorsViewModel.push connectorViewModel
@@ -133,11 +140,9 @@ ngapp.service "flowchartDataModel", [ ()->
     # Set to true when the connection is selected.
     @_selected = false
     @sourceCoordX = ->
-      if @source
-        @source.parentNode().x() + @source.x()
+      if @source then return @source.parentNode().x() + @source.x()
     @sourceCoordY = ->
-      if @source
-        @source.parentNode().y() + @source.y()
+      if @source then return @source.parentNode().y() + @source.y()
     @sourceCoord = ->
       x: @sourceCoordX()
       y: @sourceCoordY()
@@ -146,11 +151,9 @@ ngapp.service "flowchartDataModel", [ ()->
     @sourceTangentY = ->
       flowchart.computeConnectionSourceTangentY @sourceCoord(), @destCoord()
     @destCoordX = ->
-      if @dest
-        @dest.parentNode().x() + @dest.x()
+      if @dest then return @dest.parentNode().x() + @dest.x()
     @destCoordY = ->
-      if @dest
-        @dest.parentNode().y() + @dest.y()
+      if @dest then return @dest.parentNode().y() + @dest.y()
     @destCoord = ->
       x: @destCoordX()
       y: @destCoordY()
@@ -199,6 +202,8 @@ ngapp.service "flowchartDataModel", [ ()->
     y: flowchart.computeConnectionDestTangentY(pt1, pt2)
   # View model for the chart.
   flowchart.ChartViewModel = (chartDataModel) ->
+    @width = flowchart.width
+    @height = flowchart.height
     # Find a specific node within the chart.
     @findNode = (nodeID) ->
       i = 0
@@ -208,54 +213,30 @@ ngapp.service "flowchartDataModel", [ ()->
         ++i
       throw new Error("Failed to find node " + nodeID)
       return
-    # Find a specific input connector within the chart.
-    @findInputConnector = (nodeID, connectorIndex) ->
-      ###
+    # Find a specific connector within the chart.
+    @findConnector = (nodeID, connectorIndex) ->
       node = @findNode(nodeID)
-
-      for co in node.inputConnectors
-        if node.inputConnectors.indexOf(co) is connectorIndex
-          #console.log co
-          return co
-      if not node.inputConnectors or node.inputConnectors.length <= connectorIndex
-        throw new Error("Node " + nodeID + " has invalid input connectors.")
-      node.inputConnectors[connectorIndex]
-      ###
-      node = @findNode(nodeID)
-      for co in node.inputConnectors
-        #console.log co
-        if co.data.name is connectorIndex
-          n = co
-      for co in node.outputConnectors
-        #console.log co
-        if co.data.name is connectorIndex
-          n = co
-      n
-    # Find a specific output connector within the chart.
-    @findOutputConnector = (nodeID, connectorIndex) ->
-      #if not node.outputConnectors or node.outputConnectors.length <= connectorIndex
-      #  throw new Error("Node " + nodeID + " has invalid output connectors.")
-      node = @findNode(nodeID)
-      for co in node.outputConnectors
-        #console.log co
-        if co.data.name is connectorIndex
-          n = co
-      for co in node.inputConnectors
-        #console.log co
-        if co.data.name is connectorIndex
-          n = co
-          #return co
-      #n = node.outputConnectors[connectorIndex]
-      #console.log 'node.outputConnectors[connectorIndex]'
-      #console.log n
-      console.log connectorIndex if n is undefined
-      console.log node.outputConnectors if n is undefined
-      console.log node.inputConnectors if n is undefined
+      i = 0
+      while i < node.inputConnectors.length
+        nin = node.inputConnectors[i]
+        if nin.data.name is connectorIndex
+          n = nin
+          i = node.inputConnectors.length
+        else
+          i++
+      j = 0
+      while j < node.outputConnectors.length
+        nout = node.outputConnectors[j]
+        if nout.data.name is connectorIndex
+          n = nout
+          j = node.outputConnectors.length
+        else
+          j++
       n
     # Create a view model for connection from the data model.
     @_createConnectionViewModel = (connectionDataModel) ->
-      sourceConnector = @findOutputConnector(connectionDataModel.source.nodeID, connectionDataModel.source.connectorIndex)
-      destConnector = @findInputConnector(connectionDataModel.dest.nodeID, connectionDataModel.dest.connectorIndex)
+      sourceConnector = @findConnector(connectionDataModel.source.nodeID, connectionDataModel.sourceport)
+      destConnector = @findConnector(connectionDataModel.dest.nodeID, connectionDataModel.targetport)
       new flowchart.ConnectionViewModel(connectionDataModel, sourceConnector, destConnector)
     # Wrap the connections data-model in a view-model.
     @_createConnectionsViewModel = (connectionsDataModel) ->
@@ -454,8 +435,7 @@ ngapp.service "flowchartDataModel", [ ()->
       selectedConnections
     return
   return
-]
-ngapp.service "prompt", ["$modal", ($modal) ->
+]).service("prompt", ["$modal", ($modal) ->
   @show = (title, value, $scope, cb) ->
     $scope.title = title
     Modal = $modal
@@ -475,15 +455,14 @@ ngapp.service "prompt", ["$modal", ($modal) ->
     $scope.confirm = () ->
       $scope.hide()
       cb()
-]
-ngapp.controller "AppCtrl", [
+]).controller("AppCtrl", [
   "$scope"
   "$http"
   "prompt"
   "flowchartDataModel"
   "topoAlgorithm"
   AppCtrl = ($scope, $http, prompt, flowchartDataModel, topoAlgorithm) ->
-    $http.get('resource/wonju_topd.json').success (topd) ->
+    $http.get('resource/topo_for_debug.json').success (topd) ->
       raw = (dev for ip,dev of topd)
       cb = (data) ->
         chartDataModel =
@@ -569,7 +548,7 @@ ngapp.controller "AppCtrl", [
         $scope.chartViewModel = new flowchartDataModel.ChartViewModel(data)
         #console.log 'this is callback'
       topoAlgorithm.preProcess(raw, cb)
-  # Code for the delete key.
+    # Code for the delete key.
     deleteKeyCode = 46
     deleteKeyCodeMac = 8
     # Code for control key.
@@ -705,9 +684,7 @@ ngapp.controller "AppCtrl", [
       return
     # Create the view-model for the chart and attach to the scope.
     #$scope.chartViewModel = new flowchartDataModel.ChartViewModel(chartDataModel)
-]
-
-ngapp.directive "ngRightClick", ($parse) ->
+]).directive("ngRightClick", ($parse) ->
   (scope, element, attrs) ->
     fn = $parse(attrs.ngRightClick)
     element.bind "contextmenu", (event) ->
@@ -715,8 +692,7 @@ ngapp.directive "ngRightClick", ($parse) ->
         event.preventDefault()
         fn scope,
           $event: event
-
-ngapp.directive "machine", ->
+).directive "machine", ->
   restrict: "E"
   templateUrl: "flowchart/machine.html"
   replace: true
