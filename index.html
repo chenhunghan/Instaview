@@ -58,6 +58,14 @@
 				<!--
 				This custom element defines the flowchart.
 				-->
+                <ul class="nodelist">
+                    <li
+                            ng-repeat="node in chartViewModel.data.nodes track by $index"
+                            ng-mousedown="nodelistMouseDown($event, node)"
+                            >
+                        <input type="button" class="btn btn-default btn-xs nodelistbtn" value="{{node.name}}">
+                    </li>
+                </ul>
                 <div mouse-capture>
                     <flow-chart
                         chart="chartViewModel"

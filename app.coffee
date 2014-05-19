@@ -218,7 +218,7 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
         return node if node.data.id is nodeID
         ++i
       throw new Error("Failed to find node " + nodeID)
-      return
+      return false
     # Find a specific connector within the chart.
     @findConnector = (nodeID, connectorIndex) ->
       node = @findNode(nodeID)
@@ -554,7 +554,6 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
         $scope.chartViewModel = new flowchartDataModel.ChartViewModel(data)
         #console.log 'this is callback'
       noPoscb = (data) ->
-        console.log data.nodes
         $scope.nodelist = data.nodes
       #topoAlgorithm.preProcess(raw, cb)
       topoAlgorithm.preProcess(raw, noPoscb, 'noPos')
@@ -613,7 +612,14 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
       if evt.keyCode is aKeyCode
         ADown = false
     # Add a new node to the chart.
-
+    $scope.nodelistMouseDown = (evt, node) ->
+      if $scope.chartViewModel.findNode(node.id)?
+        $scope.chartViewModel.findNode(node.id).toggleSelected()
+        console.log $scope.chartViewModel.findNode(node.id)
+      else
+        node.x = evt.clientX + 100
+        node.y = evt.clientY
+        $scope.chartViewModel.addNode node
     $scope.addNewNode = ->
       InitialNodeX = InitialNodeX + 15
       InitialNodeY = InitialNodeY + 15

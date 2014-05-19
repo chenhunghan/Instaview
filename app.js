@@ -265,6 +265,7 @@
             ++i;
           }
           throw new Error("Failed to find node " + nodeID);
+          return false;
         };
         this.findConnector = function(nodeID, connectorIndex) {
           var i, j, n, nin, nout;
@@ -628,7 +629,6 @@
           return $scope.chartViewModel = new flowchartDataModel.ChartViewModel(data);
         };
         noPoscb = function(data) {
-          console.log(data.nodes);
           return $scope.nodelist = data.nodes;
         };
         topoAlgorithm.preProcess(raw, noPoscb, 'noPos');
@@ -683,6 +683,16 @@
         }
         if (evt.keyCode === aKeyCode) {
           return ADown = false;
+        }
+      };
+      $scope.nodelistMouseDown = function(evt, node) {
+        if ($scope.chartViewModel.findNode(node.id) != null) {
+          $scope.chartViewModel.findNode(node.id).toggleSelected();
+          return console.log($scope.chartViewModel.findNode(node.id));
+        } else {
+          node.x = evt.clientX + 100;
+          node.y = evt.clientY;
+          return $scope.chartViewModel.addNode(node);
         }
       };
       $scope.addNewNode = function() {

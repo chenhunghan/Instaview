@@ -124,10 +124,10 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
 
     # Called for each mouse move on the svg element.
     $scope.mouseMove = (evt) ->
-      # Clear out all cached mouse over elements.
       for connection in $scope.chart.connections
         do (connection) ->
           connection.opacity = connection.distance()/2000
+      # Clear out all cached mouse over elements.
       $scope.mouseOverConnection = null
       $scope.mouseOverConnector = null
       $scope.mouseOverNode = null
@@ -151,7 +151,6 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
       return
     # Handle mousedown on a node.
     $scope.nodeMouseDown = (evt, node) ->
-
       if evt.shiftKey or evt.ctrlKey
         $scope.chart.handleNodeClicked node, true
       else
