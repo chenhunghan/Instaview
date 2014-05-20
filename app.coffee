@@ -74,6 +74,7 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
     @outputConnectors = createConnectorsViewModel(@data.outputConnectors, flowchart.nodeWidth, this)
     # Set to true when the node is selected.
     @_selected = false
+    @data.nodeAlive = true
     # Name of the node.
     @name = ->
       @data.name or ""
@@ -105,6 +106,8 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
     # Returns true if the node is selected.
     @selected = ->
       @_selected
+    @nodeAlive = ->
+      @data.nodeAlive
     # Internal function to add a connector.
     @_addConnector = (connectorDataModel, x, connectorsDataModel, connectorsViewModel) ->
       connectorViewModel = new connector.ConnectorViewModel(connectorDataModel, x, flowchart.computeConnectorY(connectorsViewModel.length), this)
@@ -182,6 +185,12 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
     # Returns true if the connection is selected.
     @selected = ->
       @_selected
+    @data.connectionAlive = true
+    @data.connectionNotBlocked = true
+    @connectionAlive = ->
+      @data.connectionAlive
+    @connectionNotBlocked = ->
+      @data.connectionNotBlocked
     return
   # Helper function.
   computeConnectionTangentOffset = (pt1, pt2) ->
@@ -699,6 +708,21 @@ angular.module("app", ["flowChart", 'mgcrea.ngStrap', 'topo']).service( "node", 
     $scope.deleteSelected = ->
       $scope.chartViewModel.deleteSelected()
       return
+    $scope.random_connectiondown = ->
+      max = $scope.chartViewModel.data.connections.length - 1
+      min = 0
+      linkindex = Math.floor(Math.random() * (max - min + 1)) + min
+      $scope.chartViewModel.data.connections[linkindex].connectionAlive = false
+    $scope.random_connectionblock = ->
+      max = $scope.chartViewModel.data.connections.length - 1
+      min = 0
+      linkindex = Math.floor(Math.random() * (max - min + 1)) + min
+      $scope.chartViewModel.data.connections[linkindex].connectionNotBlocked = false
+    $scope.random_nodedown = ->
+      max = $scope.chartViewModel.data.nodes.length - 1
+      min = 0
+      nodeindex = Math.floor(Math.random() * (max - min + 1)) + min
+      $scope.chartViewModel.data.nodes[nodeindex].nodeAlive = false
     # Create the view-model for the chart and attach to the scope.
     #$scope.chartViewModel = new flowchartDataModel.ChartViewModel(chartDataModel)
 ]).directive("ngRightClick", ($parse) ->

@@ -157,12 +157,90 @@ node list
     outline: rgba(0,0,0,0) none;
 }
 
-.nodelistbtn:active {
-    outline: none;
+.testbtns {
+    position: fixed;
+    top:40px;
+    left:120px;
+    list-style: none;
+    font-size:12px;
 }
 
-.nodelistbtn:active, .nodelistbtn:active {
-    outline: none;
-    background-color: black;
-    color: white;
+/*status*/
+
+.node-status {
+    -webkit-transform: scale(1.3);
+    -webkit-transform: translate(-10px, -20px);
+
+}
+.node-dead {
+    opacity: 0.2;
+    fill: #FF0000;
+    -webkit-animation: node-dead-blink;
+    -webkit-animation-duration: 3s;
+    -webkit-animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes node-dead-blink {
+    0% {
+        -webkit-transform: translate(-10px, -22px) scale(1,1);
+        opacity: 0.2;
+    }
+    50% {
+        -webkit-transform: translate(-10px, -22px) scale(1.3,1.5);
+        opacity: 1;
+    }
+    100% {
+        -webkit-transform: translate(-10px, -22px) scale(1,1);
+        opacity: 0.2;
+    }
+}
+
+.connection-dead {
+    stroke: rgba(200,0,0,0.8);
+    stroke-opacity: 1;
+    stroke-width: 1.5;
+    stroke-dasharray: 2;
+    fill: transparent;
+    -webkit-animation: connection-dead-sign-blink;
+    -webkit-animation-duration: 2s;
+    -webkit-animation-iteration-count: infinite;
+}
+
+.connection-dead-sign {
+    fill: rgba(255,0,0,0.3);
+    -webkit-transform: scale(2,2);
+    -webkit-animation: connection-dead-sign-blink;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: infinite;
+}
+
+.connection-dead-text {
+    font-size:11.5px;
+    font-family: Arial;
+    fill: rgba(200,0,0,0.6);
+    -webkit-animation: connection-dead-sign-blink;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: infinite;
+}
+
+@-webkit-keyframes connection-dead-sign-blink {
+    0% {
+        opacity: 0.2;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.2;
+    }
+}
+
+.connection-blocked-text {
+    font-size:11px;
+    font-family: Arial;
+    fill: rgba(250,90,0,0.6);
+}
+
+.connection-blocked-sign {
+    fill: rgba(255,90,0,0.5);
 }

@@ -92,6 +92,7 @@
         this.inputConnectors = createConnectorsViewModel(this.data.inputConnectors, 0, this);
         this.outputConnectors = createConnectorsViewModel(this.data.outputConnectors, flowchart.nodeWidth, this);
         this._selected = false;
+        this.data.nodeAlive = true;
         this.name = function() {
           return this.data.name || "";
         };
@@ -120,6 +121,9 @@
         };
         this.selected = function() {
           return this._selected;
+        };
+        this.nodeAlive = function() {
+          return this.data.nodeAlive;
         };
         this._addConnector = function(connectorDataModel, x, connectorsDataModel, connectorsViewModel) {
           var connectorViewModel;
@@ -222,6 +226,14 @@
         };
         this.selected = function() {
           return this._selected;
+        };
+        this.data.connectionAlive = true;
+        this.data.connectionNotBlocked = true;
+        this.connectionAlive = function() {
+          return this.data.connectionAlive;
+        };
+        this.connectionNotBlocked = function() {
+          return this.data.connectionNotBlocked;
         };
       };
       computeConnectionTangentOffset = function(pt1, pt2) {
@@ -785,8 +797,29 @@
         };
         return prompt("Enter a connector name:", "", $scope, cb);
       };
-      return $scope.deleteSelected = function() {
+      $scope.deleteSelected = function() {
         $scope.chartViewModel.deleteSelected();
+      };
+      $scope.random_connectiondown = function() {
+        var linkindex, max, min;
+        max = $scope.chartViewModel.data.connections.length - 1;
+        min = 0;
+        linkindex = Math.floor(Math.random() * (max - min + 1)) + min;
+        return $scope.chartViewModel.data.connections[linkindex].connectionAlive = false;
+      };
+      $scope.random_connectionblock = function() {
+        var linkindex, max, min;
+        max = $scope.chartViewModel.data.connections.length - 1;
+        min = 0;
+        linkindex = Math.floor(Math.random() * (max - min + 1)) + min;
+        return $scope.chartViewModel.data.connections[linkindex].connectionNotBlocked = false;
+      };
+      return $scope.random_nodedown = function() {
+        var max, min, nodeindex;
+        max = $scope.chartViewModel.data.nodes.length - 1;
+        min = 0;
+        nodeindex = Math.floor(Math.random() * (max - min + 1)) + min;
+        return $scope.chartViewModel.data.nodes[nodeindex].nodeAlive = false;
       };
     }
   ]).directive("ngRightClick", function($parse) {

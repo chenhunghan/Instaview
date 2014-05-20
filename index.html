@@ -60,10 +60,32 @@
 				-->
                 <ul class="nodelist">
                     <li
-                            ng-repeat="node in chartViewModel.data.nodes track by $index"
+                            ng-repeat="node in chartViewModel.nodes track by $index"
                             ng-mousedown="nodelistMouseDown($event, node)"
                             >
-                        <input type="button" class="btn btn-default btn-xs nodelistbtn" value="{{node.name}}">
+                        <input type="button"
+                               class="btn btn-default btn-xs nodelistbtn"
+                               value="{{node.data.name}}">
+                    </li>
+                </ul>
+                <ul class="testbtns">
+                    <li>
+                        <input type="button"
+                               class="btn btn-default btn-xs"
+                               value='random_connectiondown'
+                               ng-click="random_connectiondown()">
+                    </li>
+                    <li>
+                        <input type="button"
+                               class="btn btn-default btn-xs"
+                               value='random_connectionblock'
+                               ng-click="random_connectionblock()">
+                    </li>
+                    <li>
+                        <input type="button"
+                               class="btn btn-default btn-xs"
+                               value='random_nodedown'
+                               ng-click="random_nodedown()">
                     </li>
                 </ul>
                 <div mouse-capture>
