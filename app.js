@@ -37,6 +37,10 @@
           x = x - node.padding;
         }
         this.data = connectorDataModel;
+        this.data.linked = true;
+        this.linked = function() {
+          return this.data.linked;
+        };
         this._parentNode = parentNode;
         this._x = x;
         this._y = y;
@@ -93,6 +97,7 @@
         this.outputConnectors = createConnectorsViewModel(this.data.outputConnectors, flowchart.nodeWidth, this);
         this._selected = false;
         this.data.nodeAlive = true;
+        this.data.nodeWarning = false;
         this.name = function() {
           return this.data.name || "";
         };
@@ -124,6 +129,9 @@
         };
         this.nodeAlive = function() {
           return this.data.nodeAlive;
+        };
+        this.nodeWarning = function() {
+          return this.data.nodeWarning;
         };
         this._addConnector = function(connectorDataModel, x, connectorsDataModel, connectorsViewModel) {
           var connectorViewModel;
@@ -814,12 +822,35 @@
         linkindex = Math.floor(Math.random() * (max - min + 1)) + min;
         return $scope.chartViewModel.data.connections[linkindex].connectionNotBlocked = false;
       };
-      return $scope.random_nodedown = function() {
+      $scope.random_nodedown = function() {
         var max, min, nodeindex;
         max = $scope.chartViewModel.data.nodes.length - 1;
         min = 0;
         nodeindex = Math.floor(Math.random() * (max - min + 1)) + min;
         return $scope.chartViewModel.data.nodes[nodeindex].nodeAlive = false;
+      };
+      $scope.random_nodewarn = function() {
+        var max, min, nodeindex;
+        max = $scope.chartViewModel.data.nodes.length - 1;
+        min = 0;
+        nodeindex = Math.floor(Math.random() * (max - min + 1)) + min;
+        return $scope.chartViewModel.data.nodes[nodeindex].nodeWarning = true;
+      };
+      return $scope.random_portdown = function() {
+        var connectorindex, max, min, nodeindex;
+        max = $scope.chartViewModel.data.nodes.length - 1;
+        min = 0;
+        nodeindex = Math.floor(Math.random() * (max - min + 1)) + min;
+        if ($scope.chartViewModel.data.nodes[nodeindex].outputConnectors.length > 0) {
+          max = $scope.chartViewModel.data.nodes[nodeindex].outputConnectors.length - 1;
+          connectorindex = Math.floor(Math.random() * (max - min + 1)) + min;
+          $scope.chartViewModel.data.nodes[nodeindex].outputConnectors[connectorindex].linked = false;
+        }
+        if ($scope.chartViewModel.data.nodes[nodeindex].inputConnectors.length > 0) {
+          max = $scope.chartViewModel.data.nodes[nodeindex].inputConnectors.length - 1;
+          connectorindex = Math.floor(Math.random() * (max - min + 1)) + min;
+          return $scope.chartViewModel.data.nodes[nodeindex].inputConnectors[connectorindex].linked = false;
+        }
       };
     }
   ]).directive("ngRightClick", function($parse) {
