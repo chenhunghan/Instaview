@@ -32,10 +32,10 @@
     }
   };
 
-  angular.module("flowChart", ["dragging"]).directive("flowChart", function() {
+  angular.module("flowChartController", ["dragging"]).directive("flowChart", function() {
     return {
       restrict: "E",
-      templateUrl: "flowchart/machine.html",
+      templateUrl: "flowchart/flowchart_template.html",
       replace: true,
       scope: {
         chart: "=chart"
@@ -318,5 +318,5 @@
 }).call(this);
 
 /*
-//@ sourceMappingURL=flowchart.map
+//@ sourceMappingURL=flowchart_controller.map
 */

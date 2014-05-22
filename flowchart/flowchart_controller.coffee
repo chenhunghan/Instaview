@@ -19,14 +19,14 @@ hasClassSVG = (obj, has) ->
     false
   else
     true
-angular.module("flowChart", ["dragging"]).directive("flowChart", ->
+angular.module("flowChartController", ["dragging"]).directive("flowChart", ->
   restrict: "E"
-  templateUrl: "flowchart/machine.html"
+  templateUrl: "flowchart/flowchart_template.html"
   replace: true
   scope:
     chart: "=chart"
   controller: "FlowChartController"
-).controller "FlowChartController", [
+).controller("FlowChartController", [
   "$scope"
   "dragging"
   "$element"
@@ -281,3 +281,4 @@ angular.module("flowChart", ["dragging"]).directive("flowChart", ->
           return
       return
 ]
+)

@@ -3,7 +3,6 @@
 		<title>IntraView</title>
         <link rel="stylesheet" type="text/css" href="lib/bootstrap-3.1.1.min.css">
         <link rel="stylesheet" type="text/css" href="lib/angular-motion.min.css">
-        <!--<link rel="stylesheet" type="text/css" href="app.css">-->
         <link rel="stylesheet" type="text/css" href="editor.css">
 	</head>	
 	<body 
@@ -118,10 +117,14 @@
 		<!-- Flowchart code. -->
 		<script src="flowchart/mouse_capture_service.js" type="text/javascript"></script>
 		<script src="flowchart/drag_service.js" type="text/javascript"></script>
-		<script src="flowchart/flowchart.js" type="text/javascript"></script>
+        <script src="modal/modal_service.js" type="text/javascript"></script>
+
+        <script src="flowchart/flowchart_datamodel.js" type="text/javascript"></script>
+		<script src="flowchart/flowchart_controller.js" type="text/javascript"></script>
         <!--Topology Related. -->
-        <script src="topo_algorithm_service.js" type="text/javascript"></script>
+        <script src="flowchart/topo_algorithm_service.js" type="text/javascript"></script>
 		<!-- App code. -->
+
 		<script src="app.js" type="text/javascript"></script>
 	</body>
 </html>
