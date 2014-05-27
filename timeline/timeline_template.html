@@ -1,0 +1,14 @@
+<div>
+    <input type="date" ng-model="startDate" />
+    <input type="time" ng-model="startTime" step="1"  />
+    <input type="date" ng-model="endDate"  />
+    <input type="time" ng-model="endTime" step="1" />
+    <pre>Start {{ startDate }} {{ startTime }} ---- End {{ endDate }} {{ endTime }}
+    </pre>
+    <input type="range" name="points" min="1" max="10">
+    <ul>
+        <li ng-reat="node in chart.data.nodes">
+            {{node}}
+        </li>
+    </ul>
+</div>

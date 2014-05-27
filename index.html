@@ -3,6 +3,7 @@
 		<title>IntraView</title>
         <link rel="stylesheet" type="text/css" href="lib/bootstrap-3.1.1.min.css">
         <link rel="stylesheet" type="text/css" href="lib/angular-motion.min.css">
+        <link rel="stylesheet" type="text/css" href="timeline/timeline.css">
         <link rel="stylesheet" type="text/css" href="editor.css">
 	</head>	
 	<body 
@@ -53,6 +54,7 @@
                         >
                         print
                      </button>
+
                 </div>
 				<!--
 				This custom element defines the flowchart.
@@ -68,6 +70,7 @@
                     </li>
                 </ul>
                 <ul class="testbtns">
+
                     <li>
                         <input type="button"
                                class="btn btn-default btn-xs"
@@ -99,14 +102,22 @@
                                ng-click="random_portdown()">
                     </li>
                 </ul>
+
                 <div mouse-capture>
+                    <timeline
+                            chart="chartViewModel"
+                            >
+                    </timeline>
                     <flow-chart
                         chart="chartViewModel"
                         >
+
                     </flow-chart>
                 </div>
+
 		    </div>
 		</div>
+
 		<!-- Library code. -->
 		<script src="lib/jquery-2.1.0.min.js" type="text/javascript"></script>
 		<script src="lib/angular-1.2.16.min.js" type="text/javascript"></script>
@@ -114,6 +125,7 @@
         <script src="lib/angular-strap-2.0.1.min.js" type="text/javascript"></script>
         <script src="lib/angular-strap-2.0.1.tpl.min.js" type="text/javascript"></script>
         <script src="lib/d3-3.4.6.min.js" type="text/javascript"></script>
+
 		<!-- Flowchart code. -->
 		<script src="flowchart/mouse_capture_service.js" type="text/javascript"></script>
 		<script src="flowchart/drag_service.js" type="text/javascript"></script>
@@ -121,10 +133,15 @@
 
         <script src="flowchart/flowchart_datamodel.js" type="text/javascript"></script>
 		<script src="flowchart/flowchart_controller.js" type="text/javascript"></script>
+
         <!--Topology Related. -->
         <script src="flowchart/topo_algorithm_service.js" type="text/javascript"></script>
-		<!-- App code. -->
 
+        <!--Timeline -->
+        <script src="lib/timeline.js" type="text/javascript"></script>
+        <script src="timeline/timeline_directive.js" type="text/javascript"></script>
+
+		<!-- App code. -->
 		<script src="app.js" type="text/javascript"></script>
 	</body>
 </html>

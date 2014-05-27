@@ -482,6 +482,54 @@
           this.connections = newConnectionViewModels;
           this.data.connections = newConnectionDataModels;
         };
+        this.updateNodeQuantity = function() {
+          var connection, connectionIndex, diff, i, newConnectionDataModels, newConnectionViewModels, newnodeid, oldnodeid;
+          oldnodeid = (function() {
+            var _i, _len, _ref, _results;
+            _ref = this.nodes;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              node = _ref[_i];
+              _results.push(node.data.id);
+            }
+            return _results;
+          }).call(this);
+          newnodeid = (function() {
+            var _i, _len, _ref, _results;
+            _ref = this.data.nodes;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              node = _ref[_i];
+              _results.push(node.id);
+            }
+            return _results;
+          }).call(this);
+          diff = (function() {
+            var _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = oldnodeid.length; _i < _len; _i++) {
+              i = oldnodeid[_i];
+              if (newnodeid.indexOf(i) === -1) {
+                _results.push(i);
+              }
+            }
+            return _results;
+          })();
+          newConnectionViewModels = [];
+          newConnectionDataModels = [];
+          connectionIndex = 0;
+          while (connectionIndex < this.connections.length) {
+            connection = this.connections[connectionIndex];
+            if (diff.indexOf(connection.data.source.nodeID) === -1 && diff.indexOf(connection.data.dest.nodeID) === -1) {
+              newConnectionViewModels.push(connection);
+              newConnectionDataModels.push(connection.data);
+            }
+            ++connectionIndex;
+          }
+          this.connections = newConnectionViewModels;
+          this.data.connections = newConnectionDataModels;
+          return this.nodes = createNodesViewModel(this.data.nodes);
+        };
         this.applySelectionRect = function(selectionRect) {
           var connection, i;
           this.deselectAll();

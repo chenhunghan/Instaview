@@ -2,7 +2,7 @@
 (function() {
   var AppCtrl;
 
-  angular.module("app", ['mgcrea.ngStrap', 'prompt', "flowchartDataModel", "flowChartController", 'topo']).controller("AppCtrl", [
+  angular.module("app", ['mgcrea.ngStrap', 'prompt', "flowchartDataModel", "flowChartController", "topo", "timeline"]).controller("AppCtrl", [
     "$scope", "$http", "prompt", "flowchartDataModel", "topoAlgorithm", AppCtrl = function($scope, $http, prompt, flowchartDataModel, topoAlgorithm) {
       var ADown, InitialNodeX, InitialNodeY, aKeyCode, ctrlDown, ctrlKeyCode, ctrlKeyCodeMac, deleteKeyCode, deleteKeyCodeMac, escKeyCode, nextNodeID, preventDefaultAction;
       $http.get('resource/topo_for_debug.json').success(function(topd) {
@@ -308,12 +308,6 @@
           });
         });
       });
-    };
-  }).directive("timeline", function() {
-    return {
-      restrict: "E",
-      templateUrl: "timeline.html",
-      replace: true
     };
   });
 

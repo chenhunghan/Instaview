@@ -1,6 +1,4 @@
-
-
-angular.module("app", ['mgcrea.ngStrap', 'prompt', "flowchartDataModel", "flowChartController", 'topo'
+angular.module("app", ['mgcrea.ngStrap', 'prompt', "flowchartDataModel", "flowChartController", "topo", "timeline"
 ]).controller("AppCtrl", [
   "$scope"
   "$http"
@@ -282,8 +280,4 @@ angular.module("app", ['mgcrea.ngStrap', 'prompt', "flowchartDataModel", "flowCh
         event.preventDefault()
         fn scope,
           $event: event
-).directive("timeline", ->
-  restrict: "E"
-  templateUrl: "timeline.html"
-  replace: true
 )

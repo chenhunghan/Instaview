@@ -510,7 +510,7 @@
     </g>
 
     <g
-                ng-repeat="connection in chart.connections"
+                ng-repeat="connection in chart.connections track by $index"
                 class="connection"
                 >
             <path

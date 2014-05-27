@@ -381,7 +381,6 @@ angular.module("flowchartDataModel", []).service( "node", [() ->
         #		nodes to keep and
         #		nodes to delete.
         nodeIndex = 0
-
         while nodeIndex < @nodes.length
           node = @nodes[nodeIndex]
           unless node.selected()
@@ -395,11 +394,9 @@ angular.module("flowchartDataModel", []).service( "node", [() ->
           ++nodeIndex
         newConnectionViewModels = []
         newConnectionDataModels = []
-
         # Remove connections that are selected.
         # Also remove connections for nodes that have been deleted.
         connectionIndex = 0
-
         while connectionIndex < @connections.length
           connection = @connections[connectionIndex]
           if not connection.selected() and deletedNodeIds.indexOf(connection.data.source.nodeID) is -1 and deletedNodeIds.indexOf(connection.data.dest.nodeID) is -1
@@ -408,14 +405,28 @@ angular.module("flowchartDataModel", []).service( "node", [() ->
             newConnectionViewModels.push connection
             newConnectionDataModels.push connection.data
           ++connectionIndex
-
         # Update nodes and connections.
         @nodes = newNodeViewModels
         @data.nodes = newNodeDataModels
         @connections = newConnectionViewModels
         @data.connections = newConnectionDataModels
         return
-
+      @updateNodeQuantity = () ->
+        oldnodeid = (node.data.id for node in @nodes)
+        newnodeid = (node.id for node in @data.nodes)
+        diff = (i for i in oldnodeid when newnodeid.indexOf(i) is -1)
+        newConnectionViewModels = []
+        newConnectionDataModels = []
+        connectionIndex = 0
+        while connectionIndex < @connections.length
+          connection = @connections[connectionIndex]
+          if diff.indexOf(connection.data.source.nodeID) is -1 and diff.indexOf(connection.data.dest.nodeID) is -1
+            newConnectionViewModels.push connection
+            newConnectionDataModels.push connection.data
+          ++connectionIndex
+        @connections = newConnectionViewModels
+        @data.connections = newConnectionDataModels
+        @nodes = createNodesViewModel(@data.nodes)
       # Select nodes and connections that fall within the selection rect.
       @applySelectionRect = (selectionRect) ->
         @deselectAll()
@@ -423,10 +434,9 @@ angular.module("flowchartDataModel", []).service( "node", [() ->
         while i < @nodes.length
           node = @nodes[i]
           # Select nodes that are within the selection rect.
-          node.select()  if node.x() >= selectionRect.x and node.y() >= selectionRect.y and node.x() + node.width() <= selectionRect.x + selectionRect.width and node.y() + node.height() <= selectionRect.y + selectionRect.height
+          node.select() if node.x() >= selectionRect.x and node.y() >= selectionRect.y and node.x() + node.width() <= selectionRect.x + selectionRect.width and node.y() + node.height() <= selectionRect.y + selectionRect.height
           ++i
         i = 0
-
         while i < @connections.length
           connection = @connections[i]
           # Select the connection if both its parent nodes are selected.
