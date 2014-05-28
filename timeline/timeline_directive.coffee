@@ -24,15 +24,20 @@ angular.module("timeline", []).directive("timeline", ['$timeout', ($timeout) ->
       start: new Date(2014, 5, 27)
       #end: new Date(2010, 8, 2) # end is optional
       content: "Event A"
+      group: 'node down'
+      type: 'dot'
+      className: '1111'
     data.push
       start: new Date(2014, 5, 24)
       content: "Event B"
+      group: 'node down'
+      className: '11122'
     data.push
       start: new Date(2014, 5, 22)
-      content: "Event C"
+      group: 'link down'
     data.push
       start: new Date(2014, 5, 21)
-      content: "Event D"
+      group: 'system down'
     timeline.draw(data)
     $timeout (->
       #console.log $scope.chart.data.nodes

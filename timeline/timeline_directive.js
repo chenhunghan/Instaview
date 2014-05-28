@@ -33,19 +33,24 @@
           data = [];
           data.push({
             start: new Date(2014, 5, 27),
-            content: "Event A"
+            content: "Event A",
+            group: 'node down',
+            type: 'dot',
+            className: '1111'
           });
           data.push({
             start: new Date(2014, 5, 24),
-            content: "Event B"
+            content: "Event B",
+            group: 'node down',
+            className: '11122'
           });
           data.push({
             start: new Date(2014, 5, 22),
-            content: "Event C"
+            group: 'link down'
           });
           data.push({
             start: new Date(2014, 5, 21),
-            content: "Event D"
+            group: 'system down'
           });
           timeline.draw(data);
           return $timeout((function() {
