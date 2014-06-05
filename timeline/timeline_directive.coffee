@@ -1,49 +1,115 @@
-angular.module("timeline", []).directive("timeline", ['$timeout', ($timeout) ->
+angular.module("timeline", []).directive("timeline", ['$timeout', '$window', '$interval', ($timeout, $window, $interval) ->
   restrict: "E"
-  template: "<div></div>"
-  replace: true
+  template: '<div>' +
+              '<div class="timeline-wraper"></div>' +
+              '<div class="timeline-controller">
+                <input type="text" ng-model="range.start.date" data-autoclose="1" placeholder="Date" bs-datepicker>
+                <input type="text" ng-model="range.start.time" data-autoclose="1" placeholder="Time" bs-timepicker>
+                <input type="text" ng-model="range.end.date" data-autoclose="1" placeholder="Date" bs-datepicker>
+                <input type="text" ng-model="range.end.time" data-autoclose="1" placeholder="Time" bs-timepicker>
+                <input type="button" ng-click="play()" value="Play">
+                <input type="button" ng-click="pause()" value="Pause">
+                <input type="button" ng-click="reset()" value="Reset">
+                <input type="button" ng-click="playback()" value="Playback">
+                <input type="number" ng-model="playbackvalue">
+                <input type="range" ng-model="playmoment" max="{{playbackend}}" min="{{playbackstart}}" step="{{playbackstep}}" style="width:90%; margin-left:70px;">
+              </div>' +
+            '</div>'
   scope:
     chart: "=chart"
-  link: (scope, ele, attr, ctrl) ->
-    onselect = () ->
-      if timeline.getSelection().length isnt 0
-        console.log data[timeline.getSelection()[0].row]
-    timeline = new links.Timeline(ele[0])
-    links.events.addListener timeline, 'select', onselect
-    options =
-      width: "90%"
-      height: "35%"
-      zoomMax: 315360000000 * 0.25 #315360000000 = 10 years
-      zoomMin: 10000 * 60
-      cluster: true
-      eventMargin: 5
-      eventMarginAxis: 10
-    timeline.setOptions options
-    data = []
-    data.push
-      start: new Date(2014, 5, 27)
-      #end: new Date(2010, 8, 2) # end is optional
-      content: "Event A"
-      group: 'node down'
-      type: 'dot'
-      className: '1111'
-    data.push
-      start: new Date(2014, 5, 24)
-      content: "Event B"
-      group: 'node down'
-      className: '11122'
-    data.push
-      start: new Date(2014, 5, 22)
-      group: 'link down'
-    data.push
-      start: new Date(2014, 5, 21)
-      group: 'system down'
-    timeline.draw(data)
-    $timeout (->
-      #console.log $scope.chart.data.nodes
-      scope.chart.data.nodes = scope.chart.data.nodes.splice(0,10)
-      scope.chart.updateNodeQuantity()
-    ), 1000
+  compile: (tele, attrs) ->
+    link = (scope, ele, attr, ctrl) ->
+      timelineWraper = $('.timeline-wraper')[0]
+      timeline = new links.Timeline(timelineWraper)
+      bind_timeline_and_controller = ->
+        scope.range = {}
+        scope.range.start = {}
+        scope.range.end = {}
+        before = new $window.Date()
+        before = before.setHours(before.getHours()-2)
+        scope.range.start.time = before
+        scope.range.start.date = before
+        scope.range.end.time = new $window.Date()
+        scope.range.end.date = new $window.Date()
+        scope.$watch 'range', (o, n) ->
+          timeline.setVisibleChartRange scope.range.start.time, scope.range.end.time
+        , true
+        onrangechange = () ->
+          scope.$apply( ->
+            timeline_range = timeline.getVisibleChartRange()
+            scope.range.start.time = timeline_range.start
+            scope.range.start.date = timeline_range.start
+            scope.range.end.time = timeline_range.end
+            scope.range.end.date = timeline_range.end
+          )
+        links.events.addListener timeline, 'rangechange', onrangechange
+      timeline_init = ->
+        options =
+          width: "90%"
+          height: "200px"
+          zoomMax: 315360000000 * 0.25 #315360000000 = 10 years
+          zoomMin: 10000 * 60
+          cluster: true
+          eventMargin: 5
+          eventMarginAxis: 10
+          groupMinHeight: 13
+        timeline.setOptions options
+        data = []
+        data.push
+          start: new Date(2014, 5, 27)
+          content: "Event A"
+          group: 'node down'
+        data.push
+          start: new Date(2014, 5, 24)
+          content: "Event B"
+          group: 'node down'
+        data.push
+          start: new Date(2014, 5, 22)
+          group: 'link down'
+        data.push
+          start: new Date(2014, 5, 21)
+          group: 'system down'
+        timeline.draw(data)
+        onselect = () ->
+          if timeline.getSelection().length isnt 0
+            console.log data[timeline.getSelection()[0].row]
+        links.events.addListener timeline, 'select', onselect
+      timeline_init()
+      bind_timeline_and_controller()
+
+      scope.play = ->
+        playtime = 5000 #milliseconds
+        scope.playbackstart = timeline.getVisibleChartRange().start.valueOf()
+        scope.playbackend = timeline.getVisibleChartRange().end.valueOf()
+        scope.playbackstep = (scope.playbackend - scope.playbackstart)/playtime
+        scope.playmoment = scope.playbackstart
+        allevent = timeline.getData()
+        playbackloop = ->
+          scope.playmoment = scope.playmoment + scope.playbackstep
+          #console.log new Date(scope.playmoment)
+          for event in allevent
+            do ->
+              if (event.start.valueOf() - scope.playmoment) > 0
+                if (event.start.valueOf() - scope.playmoment) < scope.playbackstep
+                  console.log event
+          if scope.playmoment is scope.playbackend
+            console.log 'end'
+            $interval.cancel playloop
+        playloop = $interval playbackloop, 1
+        scope.pause = ->
+          $interval.cancel playloop
+          console.log 'pause'
+          console.log scope.playmoment
+        scope.reset = ->
+          $interval.cancel playloop
+          scope.playmoment = timeline.getVisibleChartRange().start.valueOf()
+          console.log 'reset'
+      scope.playback = ->
+        console.log timeline
+      scope.$on '$destroy', ->
+        console.log 'timeline destroyed'
+      console.log timeline
+    return link
   #controller: "timelineController"
 ]).controller("timelineController", [
     "$scope"
@@ -51,8 +117,6 @@ angular.module("timeline", []).directive("timeline", ['$timeout', ($timeout) ->
     "$timeout"
     "$window"
     FlowChartController = ($scope, $element, $timeout, $window) ->
-      #console.log $element
-
       time = new $window.Date()
       Number.prototype.pad = (size) ->
         s = String(this)

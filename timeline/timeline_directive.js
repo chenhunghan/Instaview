@@ -3,60 +3,146 @@
   var FlowChartController;
 
   angular.module("timeline", []).directive("timeline", [
-    '$timeout', function($timeout) {
+    '$timeout', '$window', '$interval', function($timeout, $window, $interval) {
       return {
         restrict: "E",
-        template: "<div></div>",
-        replace: true,
+        template: '<div>' + '<div class="timeline-wraper"></div>' + '<div class="timeline-controller">\
+                <input type="text" ng-model="range.start.date" data-autoclose="1" placeholder="Date" bs-datepicker>\
+                <input type="text" ng-model="range.start.time" data-autoclose="1" placeholder="Time" bs-timepicker>\
+                <input type="text" ng-model="range.end.date" data-autoclose="1" placeholder="Date" bs-datepicker>\
+                <input type="text" ng-model="range.end.time" data-autoclose="1" placeholder="Time" bs-timepicker>\
+                <input type="button" ng-click="play()" value="Play">\
+                <input type="button" ng-click="pause()" value="Pause">\
+                <input type="button" ng-click="reset()" value="Reset">\
+                <input type="button" ng-click="playback()" value="Playback">\
+                <input type="number" ng-model="playbackvalue">\
+                <input type="range" ng-model="playmoment" max="{{playbackend}}" min="{{playbackstart}}" step="{{playbackstep}}" style="width:90%; margin-left:70px;">\
+              </div>' + '</div>',
         scope: {
           chart: "=chart"
         },
-        link: function(scope, ele, attr, ctrl) {
-          var data, onselect, options, timeline;
-          onselect = function() {
-            if (timeline.getSelection().length !== 0) {
-              return console.log(data[timeline.getSelection()[0].row]);
-            }
+        compile: function(tele, attrs) {
+          var link;
+          link = function(scope, ele, attr, ctrl) {
+            var bind_timeline_and_controller, timeline, timelineWraper, timeline_init;
+            timelineWraper = $('.timeline-wraper')[0];
+            timeline = new links.Timeline(timelineWraper);
+            bind_timeline_and_controller = function() {
+              var before, onrangechange;
+              scope.range = {};
+              scope.range.start = {};
+              scope.range.end = {};
+              before = new $window.Date();
+              before = before.setHours(before.getHours() - 2);
+              scope.range.start.time = before;
+              scope.range.start.date = before;
+              scope.range.end.time = new $window.Date();
+              scope.range.end.date = new $window.Date();
+              scope.$watch('range', function(o, n) {
+                return timeline.setVisibleChartRange(scope.range.start.time, scope.range.end.time);
+              }, true);
+              onrangechange = function() {
+                return scope.$apply(function() {
+                  var timeline_range;
+                  timeline_range = timeline.getVisibleChartRange();
+                  scope.range.start.time = timeline_range.start;
+                  scope.range.start.date = timeline_range.start;
+                  scope.range.end.time = timeline_range.end;
+                  return scope.range.end.date = timeline_range.end;
+                });
+              };
+              return links.events.addListener(timeline, 'rangechange', onrangechange);
+            };
+            timeline_init = function() {
+              var data, onselect, options;
+              options = {
+                width: "90%",
+                height: "200px",
+                zoomMax: 315360000000 * 0.25,
+                zoomMin: 10000 * 60,
+                cluster: true,
+                eventMargin: 5,
+                eventMarginAxis: 10,
+                groupMinHeight: 13
+              };
+              timeline.setOptions(options);
+              data = [];
+              data.push({
+                start: new Date(2014, 5, 27),
+                content: "Event A",
+                group: 'node down'
+              });
+              data.push({
+                start: new Date(2014, 5, 24),
+                content: "Event B",
+                group: 'node down'
+              });
+              data.push({
+                start: new Date(2014, 5, 22),
+                group: 'link down'
+              });
+              data.push({
+                start: new Date(2014, 5, 21),
+                group: 'system down'
+              });
+              timeline.draw(data);
+              onselect = function() {
+                if (timeline.getSelection().length !== 0) {
+                  return console.log(data[timeline.getSelection()[0].row]);
+                }
+              };
+              return links.events.addListener(timeline, 'select', onselect);
+            };
+            timeline_init();
+            bind_timeline_and_controller();
+            scope.play = function() {
+              var allevent, playbackloop, playloop, playtime;
+              playtime = 5000;
+              scope.playbackstart = timeline.getVisibleChartRange().start.valueOf();
+              scope.playbackend = timeline.getVisibleChartRange().end.valueOf();
+              scope.playbackstep = (scope.playbackend - scope.playbackstart) / playtime;
+              scope.playmoment = scope.playbackstart;
+              allevent = timeline.getData();
+              playbackloop = function() {
+                var event, _fn, _i, _len;
+                scope.playmoment = scope.playmoment + scope.playbackstep;
+                _fn = function() {
+                  if ((event.start.valueOf() - scope.playmoment) > 0) {
+                    if ((event.start.valueOf() - scope.playmoment) < scope.playbackstep) {
+                      return console.log(event);
+                    }
+                  }
+                };
+                for (_i = 0, _len = allevent.length; _i < _len; _i++) {
+                  event = allevent[_i];
+                  _fn();
+                }
+                if (scope.playmoment === scope.playbackend) {
+                  console.log('end');
+                  return $interval.cancel(playloop);
+                }
+              };
+              playloop = $interval(playbackloop, 1);
+              scope.pause = function() {
+                $interval.cancel(playloop);
+                console.log('pause');
+                return console.log(scope.playmoment);
+              };
+              return scope.reset = function() {
+                $interval.cancel(playloop);
+                scope.playmoment = timeline.getVisibleChartRange().start.valueOf();
+                return console.log('reset');
+              };
+            };
+            scope.playback = function() {
+              return console.log(timeline);
+            };
+            scope.$on('$destroy', function() {
+              return console.log('timeline destroyed');
+            });
+            return console.log(timeline);
           };
-          timeline = new links.Timeline(ele[0]);
-          links.events.addListener(timeline, 'select', onselect);
-          options = {
-            width: "90%",
-            height: "35%",
-            zoomMax: 315360000000 * 0.25,
-            zoomMin: 10000 * 60,
-            cluster: true,
-            eventMargin: 5,
-            eventMarginAxis: 10
-          };
-          timeline.setOptions(options);
-          data = [];
-          data.push({
-            start: new Date(2014, 5, 27),
-            content: "Event A",
-            group: 'node down',
-            type: 'dot',
-            className: '1111'
-          });
-          data.push({
-            start: new Date(2014, 5, 24),
-            content: "Event B",
-            group: 'node down',
-            className: '11122'
-          });
-          data.push({
-            start: new Date(2014, 5, 22),
-            group: 'link down'
-          });
-          data.push({
-            start: new Date(2014, 5, 21),
-            group: 'system down'
-          });
-          timeline.draw(data);
-          return $timeout((function() {
-            scope.chart.data.nodes = scope.chart.data.nodes.splice(0, 10);
-            return scope.chart.updateNodeQuantity();
-          }), 1000);
+          return link;
         }
       };
     }
